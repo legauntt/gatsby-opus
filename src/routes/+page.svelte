@@ -31,6 +31,10 @@
 			<img src="/lar/20.png" alt="Pitchaw on da 20" class="h-96 lg:h-256 object-contain" />
 		</div>
 
+		<div>
+			
+		</div>
+
 		<div class="ml-5">
 			{#each TRACKLIST as track}
 				<div class="pt-2">
