@@ -137,6 +137,10 @@
 		start={startTime}<br/>
 		duration={duration}<br/>
 	</div> -->
+
+	<div class="mt-5">
+		<a href="/" class="text-yellow-500 hover:underline">Denny, let's go hoooome.</a>
+	</div>
 </div>
 
 <style scoped></style>

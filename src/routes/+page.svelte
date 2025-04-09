@@ -51,6 +51,22 @@
 			</div>
 		</div>
 	{/if}
+
+	<div class="mt-5"></div>
+	<div>
+		<a
+			target="_blank"
+			class="text-yellow-300 hover:underline"
+			href="/wtc?t=02_glosky&s=173&l=5&title=8x10%20glosky">Glowsky</a
+		>
+	</div>
+	<div>
+		<a
+			target="_blank"
+			class="text-yellow-300 hover:underline"
+			href="/wtc?t=06_someday&s=7&l=3.2&title=A%20pink%20slip">A Pink Slip</a
+		>
+	</div>
 </div>
 
 <style scoped>
