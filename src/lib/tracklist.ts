@@ -12,5 +12,18 @@ export const TRACKLIST = [
 	'11_medusa.m4a',
 	'12_rounds.m4a',
 	'13_party.m4a',
+
+	'bonus_2bad2die.m4a',
+	'bonus_all-down.m4a',
+	'bonus_camaro.m4a',
+	'bonus_hooodin.m4a',
+	'bonus_lawn-time.m4a',
+	'bonus_poncho.m4a',
 	'bonus_whale.m4a'
-].map((entry) => `/dvdp/${entry}`);
+].map((trackName) => {
+	if (trackName.startsWith('bonus_')) {
+		return `/bonus/${trackName}`;
+	} else {
+		return `/dvdp/${trackName}`;
+	}
+});
