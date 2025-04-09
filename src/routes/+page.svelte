@@ -30,6 +30,10 @@
 			troof.play();
 			audioRefs = [...audioRefs, troof];
 		});
+
+		troof.addEventListener('ended', (event) => {
+			playCounts[track]--;
+		});
 	};
 
 	const sanity = () => {
