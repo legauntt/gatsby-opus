@@ -51,6 +51,7 @@
 			<span class="ml-3 text-slate-500">{audioRefs.length}</span>
 		{/if}
 
+		<!-- See https://svelte.dev/tutorial/svelte/media-elements -->
 		<div>
 			{#each audioRefs as ref}
 				<div>
