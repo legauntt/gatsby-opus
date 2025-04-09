@@ -1,48 +1,32 @@
 <script lang="ts">
 	import { TRACKLIST } from '$lib/tracklist';
+	import Track from './track.svelte';
 
-	let audioRefs: HTMLAudioElement[] = $state([]);
 	let discCoverImage: string = $state('/lar/marquee.png');
+	let insanityFactor = $state(0);
+	let tracks: string[] = $state(TRACKLIST);
 
-	let playCounts: any = $state({});
+	const sanity = () => {
+		const event = new CustomEvent('pirates_and_traitors', { detail: 'KTA' });
+		document.dispatchEvent(event);
 
-	// Remove parent folder from displayed name
-	const formatTrack = (track: string) => {
-		return track.split('/').slice(-1)[0];
+		insanityFactor = 0;
 	};
 
-	const playTruth = (track: string) => {
-		const troof = new Audio(track);
+	const onPlayTrack = (track: string) => {
+		console.log('child played', track);
 
-		if (playCounts[track]) {
-			playCounts[track]++;
-		} else {
-			playCounts[track] = 1;
-		}
+		insanityFactor++;
 
 		if (track.includes('bonus_')) {
 			discCoverImage = '/lar/20.png';
 		} else {
 			discCoverImage = '/lar/marquee.png';
 		}
-
-		troof.addEventListener('canplaythrough', (event) => {
-			troof.play();
-			audioRefs = [...audioRefs, troof];
-		});
-
-		troof.addEventListener('ended', (event) => {
-			playCounts[track]--;
-		});
 	};
 
-	const sanity = () => {
-		audioRefs.forEach((ref) => {
-			ref?.pause();
-		});
-
-		audioRefs = [];
-		playCounts = {};
+	const onEndTrack = (track: string) => {
+		insanityFactor--;
 	};
 </script>
 
@@ -53,33 +37,20 @@
 		</div>
 
 		<div class="ml-5">
-			{#each TRACKLIST as track}
-				<div class="pt-2">
-					<button
-						onclick={() => playTruth(track)}
-						class="text-violet-500 hover:text-yellow-500 hover:underline"
-					>
-						{formatTrack(track)}
-					</button>
-
-					{#if playCounts[track] > 0}
-						<span class="ml-3 text-slate-500">{playCounts[track]}</span>
-					{/if}
-				</div>
+			{#each tracks as track}
+				<Track {track} {onPlayTrack} {onEndTrack} />
 			{/each}
 		</div>
 	</div>
 
-	<div>
-		{#if audioRefs.length > 2}
-			<div class="mt-5">
-				<div>
-					Insanity Factor: {audioRefs.length}
-					<button onclick={sanity} class="ml-3 bg-orange-100 p-2 text-black">Make It Stop</button>
-				</div>
+	{#if insanityFactor > 2}
+		<div class="mt-5">
+			<div>
+				Insanity Factor: {insanityFactor}
+				<button onclick={sanity} class="ml-3 bg-orange-100 p-2 text-black">Make It Stop</button>
 			</div>
-		{/if}
-	</div>
+		</div>
+	{/if}
 </div>
 
 <style scoped>
