@@ -129,6 +129,11 @@
 	};
 </script>
 
+<svelte:head>
+	<title>What The C?</title>
+	<meta name="description" content="Yehhh fotabip fotaboop" />
+</svelte:head>
+
 <div class="p-5">
 	<div class="text-3xl">What The C?...</div>
 

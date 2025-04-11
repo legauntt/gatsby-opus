@@ -1,5 +1,5 @@
 <script lang="ts">
-	import * as _ from 'lodash';
+	import { random } from 'lodash';
 
 	let audioElm: HTMLAudioElement;
 	let woahing = $state(false);
@@ -12,7 +12,7 @@
 	};
 
 	setInterval(() => {
-		if (!woahing && _.random(1, 255) == 255) {
+		if (!woahing && random(1, 255) == 255) {
 			const woah = new Audio('/butts/woah.mp3');
 			woahing = true;
 			woah.play();
@@ -24,7 +24,7 @@
 			console.log(new Date(), 'added woah');
 		}
 
-		if (_.random(1, 69) == 69) {
+		if (random(1, 69) == 69) {
 			const moody = new Audio('/butts/moody.mp3');
 			moody.play();
 			moodyCount++;
@@ -36,6 +36,13 @@
 		}
 	}, 500);
 </script>
+
+<svelte:head>
+	<title>
+		{woahing ? 'WOOOOOOOOOOOAH' : "Butterfly C'anctuary"}
+	</title>
+	<meta name="description" content="Woooooooooah" />
+</svelte:head>
 
 <div class="butterfly-garden relative bg-slate-900">
 	<audio src="/butts/JGE.mp3" loop class="absolute top-5 left-5" autoplay bind:this={audioElm}
