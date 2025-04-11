@@ -23,25 +23,29 @@
 	const forceAudio = () => {
 		if (audioElm && audioElm.paused) {
 			audioElm.play();
-		} else {
-			if (dreams >= 10) {
-				return;
-			}
-
-			const dreamsTrack = new Audio('/butts/dreams.mp3');
-			if (dreams > 0) {
-				dreamsQueue.push(dreamsTrack);
-			} else {
-				dreamsTrack.play();
-				lastDream = Date.now();
-			}
-
-			dreams++;
-
-			dreamsTrack.addEventListener('ended', () => {
-				dreams--;
-			});
 		}
+
+		addDream();
+	};
+
+	const addDream = () => {
+		if (dreams >= 10) {
+			return;
+		}
+
+		const dreamsTrack = new Audio('/butts/dreams.mp3');
+		if (dreams > 0) {
+			dreamsQueue.push(dreamsTrack);
+		} else {
+			dreamsTrack.play();
+			lastDream = Date.now();
+		}
+
+		dreams++;
+
+		dreamsTrack.addEventListener('ended', () => {
+			dreams--;
+		});
 	};
 
 	setInterval(() => {
@@ -62,6 +66,11 @@
 			const woah = new Audio('/butts/woah.mp3');
 			woahing = true;
 			woah.play();
+
+			// ensure dreams=10.
+			for (let i = 1; i <= 10; i++) {
+				addDream();
+			}
 
 			woah.addEventListener('ended', () => {
 				woahing = false;
@@ -112,7 +121,7 @@
 		</div>
 	{/if}
 
-	<div class="absolute right-5 bottom-5 text-lg text-slate-500">2025-04-11 1:27pm</div>
+	<div class="absolute right-5 bottom-5 text-lg text-slate-500">2025-04-11 1:35pm</div>
 
 	<div bind:this={dreamsElm} class="absolute top-100 left-0 h-4 bg-red-500"></div>
 
