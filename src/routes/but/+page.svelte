@@ -92,7 +92,7 @@
 			});
 		}
 
-		if (!strawng && random(1, 12) == 12) {
+		if (!strawng && random(1, 69) == 69) {
 			console.log(new Date(), 'added strAWWWWWWWWWWWWWWWnnnnnggggggggg');
 			strawng = true;
 
@@ -139,7 +139,7 @@
 		</div>
 	{/if}
 
-	<div class="absolute right-5 bottom-5 text-lg text-slate-500">2025-04-11 1:41pm</div>
+	<div class="absolute right-5 bottom-5 text-lg text-slate-500">2025-04-11 1:48pm</div>
 
 	<div bind:this={dreamsElm} class="absolute top-100 left-0 h-4 bg-red-500"></div>
 
