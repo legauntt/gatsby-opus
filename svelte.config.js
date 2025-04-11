@@ -13,7 +13,10 @@ const config = {
 			// pages: 'builds'
 		})
 	},
-	preprocess: vitePreprocess()
+	preprocess: vitePreprocess(),
+	compilerOptions: {
+		runes: true
+	}
 };
 
 export default config;
