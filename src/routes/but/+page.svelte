@@ -37,12 +37,12 @@
 	}, 500);
 </script>
 
-<div class="relative bg-slate-900">
+<div class="butterfly-garden relative bg-slate-900">
 	<audio src="/butts/JGE.mp3" loop class="absolute top-5 left-5" autoplay bind:this={audioElm}
 	></audio>
 
 	{#if moodyCount > 0}
-		<div class="absolute top-5 left-5 text-slate-500 text-2xl">
+		<div class="absolute top-5 left-5 text-2xl text-slate-500">
 			{moodyCount}
 		</div>
 	{/if}
@@ -57,6 +57,9 @@
 </div>
 
 <style scoped>
+	.butterfly-garden {
+		font-size: 0;
+	}
 	img {
 		width: 100vw;
 		height: 100vh;
