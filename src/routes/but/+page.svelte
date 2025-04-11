@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { random } from 'lodash';
+	import _, { random } from 'lodash';
 
 	let audioElm: HTMLAudioElement;
 	let woahing = $state(false);
@@ -11,6 +11,7 @@
 	let dreamsQueue: HTMLAudioElement[] = $state([]);
 
 	let lastDream: number | null = $state(null);
+	let strawng = $state(false);
 
 	$effect(() => {
 		if (!dreamsElm) {
@@ -91,6 +92,23 @@
 			});
 		}
 
+		if (!strawng && random(1, 12) == 12) {
+			console.log(new Date(), 'added strAWWWWWWWWWWWWWWWnnnnnggggggggg');
+			strawng = true;
+
+			const mediaTrack = new Audio('/butts/strawng.mp3');
+			mediaTrack.play();
+			mediaTrack.addEventListener('ended', () => {
+				setTimeout(
+					() => {
+						console.log(`Released strawwwwn`);
+						strawng = false;
+					},
+					_.random(0, 19 * 1000)
+				);
+			});
+		}
+
 		if (random(1, 69) == 69) {
 			const moody = new Audio('/butts/moody.mp3');
 			moody.play();
@@ -121,7 +139,7 @@
 		</div>
 	{/if}
 
-	<div class="absolute right-5 bottom-5 text-lg text-slate-500">2025-04-11 1:35pm</div>
+	<div class="absolute right-5 bottom-5 text-lg text-slate-500">2025-04-11 1:41pm</div>
 
 	<div bind:this={dreamsElm} class="absolute top-100 left-0 h-4 bg-red-500"></div>
 
