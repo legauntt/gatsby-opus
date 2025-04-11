@@ -67,6 +67,10 @@
 			href="/wtc?t=06_someday&s=7&l=3.2&title=A%20pink%20slip">A Pink Slip</a
 		>
 	</div>
+
+	<div>
+		<a href="/but" class="text-red-300 hover:underline">Heh</a>
+	</div>
 </div>
 
 <style scoped>
