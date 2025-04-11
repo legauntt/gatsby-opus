@@ -79,11 +79,6 @@
 			pullingBiggest.addEventListener('ended', () => {
 				const pullinLarge = new Audio('/butts/pullin_large.mp3');
 				pullinLarge.play();
-
-				pullinLarge.addEventListener('ended', () => {
-					const pullin = new Audio('/butts/pullin.mp3');
-					pullin.play();
-				});
 			});
 		}
 
@@ -117,7 +112,7 @@
 		</div>
 	{/if}
 
-	<div class="absolute right-5 bottom-5 text-lg text-slate-500">2025-04-11 1pm</div>
+	<div class="absolute right-5 bottom-5 text-lg text-slate-500">2025-04-11 1:27pm</div>
 
 	<div bind:this={dreamsElm} class="absolute top-100 left-0 h-4 bg-red-500"></div>
 
