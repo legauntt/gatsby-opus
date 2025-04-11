@@ -27,3 +27,13 @@ export const TRACKLIST = [
 		return `/dvdp/${trackName}`;
 	}
 });
+
+export const SLOW_C = [
+	'ambience.mp3',
+	'dreams.mp3',
+	'moody.mp3',
+	'pullin_doublexl.mp3',
+	'pullin_large.mp3',
+	'strawng.mp3',
+	'woah.mp3'
+].map((trackName) => `/butts/${trackName}`);

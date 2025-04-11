@@ -130,7 +130,7 @@
 </svelte:head>
 
 <div class="butterfly-garden relative bg-slate-900">
-	<audio src="/butts/JGE.mp3" loop class="absolute top-5 left-5" autoplay bind:this={audioElm}
+	<audio src="/butts/ambience.mp3" loop class="absolute top-5 left-5" autoplay bind:this={audioElm}
 	></audio>
 
 	{#if moodyCount > 0}
