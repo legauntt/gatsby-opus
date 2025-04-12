@@ -4,7 +4,7 @@
 	import Stool from './stool.svelte';
 	import { nanoid } from 'nanoid';
 	import { random } from 'lodash';
-	import { tick } from 'svelte';
+	import { onMount, tick } from 'svelte';
 
 	interface IClice {
 		id: string;
@@ -28,7 +28,6 @@
 	let clices: IClice[] = $state([]);
 	let logs: string[] = $state([]);
 
-	let gameLoop: any = $state(null);
 	let gameRefs: any[] = $state([]);
 	let trackCounts: any = $state({});
 
@@ -45,6 +44,16 @@
 	let fileInputError = $state('');
 
 	let editorState = $state('editing');
+	let rockAndRoll = $state(false);
+
+	onMount(() => {
+		const worker = new Worker('/workWork.js');
+		worker.onmessage = (e) => {
+			console.log('mess', e.data);
+			gameLoop();
+		};
+	});
+
 	const formatTrack = (track: string) => {
 		return track.split('/').slice(-1)[0];
 	};
@@ -166,7 +175,6 @@
 
 		const movingOnOverToTheBreakdownLane = () => {
 			const loaders = clices.filter((entry) => entry.orca.startType == 'onload');
-			const spawners = clices.filter((entry) => entry.orca.startType == 'random');
 
 			logIt(`Processing loaders...`);
 			loaders.forEach((loader) => {
@@ -185,45 +193,50 @@
 				});
 			});
 
-			clearInterval(gameLoop);
-			logIt("Started 'game loop'");
-			gameLoop = setInterval(() => {
-				spawners.forEach((spawner) => {
-					if (trackCounts[spawner.id] >= spawner.orca.maxInstances) {
-						return;
-					}
-
-					const dieRoll = random(1, spawner.orca.dieRoll);
-					if (dieRoll == spawner.orca.dieRoll) {
-						const audioElm = new Audio(spawner.audioFile);
-						trackCounts[spawner.id]++;
-
-						logIt(
-							`Spawning ${spawner.audioFile} ${spawner.id} from dieRoll=${dieRoll}, instances=${trackCounts[spawner.id]}`
-						);
-
-						// probably shouldn't allow the loop
-						audioElm.loop = spawner.loop;
-						audioElm.play();
-
-						gameRefs.push({
-							clice: spawner,
-							audio: audioElm
-						});
-
-						audioElm.addEventListener('ended', () => {
-							trackCounts[spawner.id]--;
-						});
-					}
-				});
-			}, 1000);
+			rockAndRoll = true;
 		};
+	};
+
+	const gameLoop = () => {
+		if (!rockAndRoll) {
+			return;
+		}
+
+		const spawners = clices.filter((entry) => entry.orca.startType == 'random');
+		spawners.forEach((spawner) => {
+			if (trackCounts[spawner.id] >= spawner.orca.maxInstances) {
+				return;
+			}
+
+			const dieRoll = random(1, spawner.orca.dieRoll);
+			if (dieRoll == spawner.orca.dieRoll) {
+				const audioElm = new Audio(spawner.audioFile);
+				trackCounts[spawner.id]++;
+
+				logIt(
+					`Spawning ${spawner.audioFile} ${spawner.id} from dieRoll=${dieRoll}, instances=${trackCounts[spawner.id]}`
+				);
+
+				// probably shouldn't allow the loop
+				audioElm.loop = spawner.loop;
+				audioElm.play();
+
+				gameRefs.push({
+					clice: spawner,
+					audio: audioElm
+				});
+
+				audioElm.addEventListener('ended', () => {
+					trackCounts[spawner.id]--;
+				});
+			}
+		});
 	};
 
 	const endInsanity = () => {
 		editorState = 'editing';
 		logIt('Ended the insanity...');
-		clearInterval(gameLoop);
+		rockAndRoll = false;
 
 		gameRefs.forEach((ref) => {
 			ref.audio.pause();
@@ -386,9 +399,7 @@
 				</div>
 			{/if}
 
-			<div class="bottom-5 left-5 mt-5 text-lg text-slate-500 md:absolute md:mt-0">
-				2025-04-12 dragon+
-			</div>
+			<a href="/" class="ml-3 text-yellow-500 hover:underline">Denny, let's go hoooome.</a>
 		{:else}
 			<div
 				class="h-[75vh] overflow-y-scroll bg-slate-500 p-2 text-black 2xl:h-[90vh]"
@@ -402,10 +413,14 @@
 			</div>
 			<div class="mt-5">
 				<button class="bg-amber-950 p-2" onclick={endInsanity}>Stop the insanity</button>
-			</div>
 
-			<a href="/" class="text-yellow-500 hover:underline">Denny, let's go hoooome.</a>
+				<a href="/" class="ml-3 text-yellow-500 hover:underline">Denny, let's go hoooome.</a>
+			</div>
 		{/if}
+
+		<div class="bottom-5 left-5 mt-5 text-lg text-slate-500 md:absolute md:mt-0">
+			2025-04-12 peon
+		</div>
 	</div>
 </div>
 
