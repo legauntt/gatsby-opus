@@ -245,7 +245,7 @@
 				</div>
 			{/if}
 
-			<div class="absolute bottom-5 left-5 text-lg text-slate-500">2025-04-11 latenightradio HEH</div>
+			<div class="mt-5 md:absolute md:mt-0 bottom-5 left-5 text-lg text-slate-500">2025-04-11 latenightradio HEH</div>
 		{:else}
 			<div class="h-[75vh] 2xl:h-[90vh] overflow-y-scroll bg-slate-500 p-2 text-black" bind:this={logsDiv}>
 				{#each logs as log}
