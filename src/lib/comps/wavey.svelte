@@ -5,14 +5,26 @@
 		currentTime: number;
 		duration: number;
 		paused: boolean;
+
 		onSeek: Function;
 		onTogglePause: Function;
+
+		subslice?: {
+			start: number;
+			end: number;
+		};
+
 		label?: string;
 	}
 
 	let props: IWaveyProps = $props();
 
+	// svelte-ignore non_reactive_update
 	let progressDiv: HTMLDivElement;
+
+	// svelte-ignore non_reactive_update
+	let sliceDiv: HTMLDivElement;
+
 	let previewSeekValue: string = $state('');
 
 	$effect(() => {
@@ -20,8 +32,24 @@
 		if (!parentWidth) {
 			return;
 		}
-		const percProgress = props.currentTime / props.duration;
-		progressDiv.style.width = percProgress * 100 + '%';
+
+		if (props.subslice) {
+			const left = (props.subslice.start / props.duration) * 100;
+			const sliceDuration = props.subslice.end - props.subslice.start;
+			const sliceWidth = (sliceDuration / props.duration) * 100;
+
+			const adjustedStarted = props.currentTime - props.subslice.start;
+			const progressWidth = (adjustedStarted / props.duration) * 100;
+
+			sliceDiv.style.left = left + '%';
+			sliceDiv.style.width = sliceWidth + '%';
+
+			progressDiv.style.left = left + '%';
+			progressDiv.style.width = progressWidth + '%';
+		} else {
+			const percProgress = props.currentTime / props.duration;
+			progressDiv.style.width = percProgress * 100 + '%';
+		}
 	});
 
 	const previewSeek = (e: any) => {
@@ -113,15 +141,28 @@
 		<div class="w-full">
 			<div>{props.label}</div>
 
-			<div
-				class="h-6 cursor-pointer overflow-hidden rounded-2xl bg-slate-700"
-				onpointerdown={dragsYaDown}
-				onmousemove={previewSeek}
-				title={previewSeekValue}
-				role="tooltip"
-			>
-				<div bind:this={progressDiv} class="h-[100%] w-0 bg-violet-500"></div>
-			</div>
+			{#if props.subslice}
+				<div
+					class="relative h-6 rounded-2xl bg-slate-700"
+					onpointerdown={dragsYaDown}
+					onmousemove={previewSeek}
+					title={previewSeekValue}
+					role="tooltip"
+				>
+					<div bind:this={sliceDiv} class="absolute h-[100%] w-0 bg-slate-300"></div>
+					<div bind:this={progressDiv} class="absolute h-[100%] w-0 bg-violet-500"></div>
+				</div>
+			{:else}
+				<div
+					class="h-6 cursor-pointer rounded-2xl bg-slate-700"
+					onpointerdown={dragsYaDown}
+					onmousemove={previewSeek}
+					title={previewSeekValue}
+					role="tooltip"
+				>
+					<div bind:this={progressDiv} class="h-[100%] w-0 bg-violet-500"></div>
+				</div>
+			{/if}
 		</div>
 
 		<div class="inline-block">{formatTime(props.duration)}</div>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { SLOW_C as tracklist } from '$lib/tracklist';
+	import { TREASURE_TROVE } from '$lib/cetlist';
 	import dayjs from 'dayjs';
 	import Stool from './stool.svelte';
 	import { nanoid } from 'nanoid';
@@ -345,7 +345,7 @@
 					class="border border-solid border-slate-500 bg-black p-2 align-middle"
 					bind:value={selectedTrack}
 				>
-					{#each tracklist as track}
+					{#each TREASURE_TROVE.CLICES as track}
 						<option value={track}>{formatTrack(track)}</option>
 					{/each}
 				</select>

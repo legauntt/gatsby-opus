@@ -1,8 +1,9 @@
 <script lang="ts">
+	import { TREASURE_TROVE } from '$lib/cetlist';
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
-	import { TRACKLIST } from '$lib/tracklist';
 	import Wavey from '$lib/comps/wavey.svelte';
+	import Cashew from './cashew.svelte';
 
 	const trackName = (page.url.searchParams.get('t') || '').toLowerCase();
 	const startTime = Number(page.url.searchParams.get('s') || 0);
@@ -21,24 +22,25 @@
 			return;
 		}
 
-		let prefix = 'dvdp';
-		if (trackName.startsWith('bonus_')) {
-			prefix = 'bonus';
+		let fullName = '';
+
+		for (const [key, tracks] of Object.entries(TREASURE_TROVE)) {
+			const track = tracks.find((entry) => {
+				const name = entry.split('/').slice(-1)[0].replace(".m4a", "").replace(".mp3", "");
+				// console.log("heh", name, trackName);
+				return name == trackName;
+			});
+
+			if (track) {
+				fullName = track;
+				break;
+			}
 		}
 
-		const fullName = `/${prefix}/${trackName}.m4a`;
-
-		const foundIt = TRACKLIST.some((track) => {
-			return fullName == track;
-		});
-
-		if (!foundIt) {
-			console.warn(`No such track ${fullName}`);
-			return;
+		if (fullName) {
+			console.log(`Found track from ${trackName}`, fullName);
+			troof = fullName;
 		}
-
-		console.log(`Wup a doop`, fullName);
-		troof = fullName;
 	});
 
 	setInterval(() => {
@@ -48,13 +50,10 @@
 	}, 100);
 
 	const onTogglePause = () => {
-		console.log("hm", paused);
 		paused = !paused;
 	};
 
-	const onSeek = () => {
-		console.log("heh");
-	};
+	const onSeek = () => {};
 </script>
 
 <svelte:head>
@@ -82,7 +81,18 @@
 	</div>
 
 	<div>
-		<Wavey {currentTime} {paused} {duration} {onTogglePause} {onSeek} />
+		<Wavey
+			{currentTime}
+			{paused}
+			{duration}
+			{onTogglePause}
+			{onSeek}
+			subslice={{ start: startTime, end: startTime + loopDuration }}
+		/>
+	</div>
+
+	<div>
+		<Cashew />
 	</div>
 
 	<div class="mt-5">
