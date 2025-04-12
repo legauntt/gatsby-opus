@@ -135,8 +135,6 @@
 		editorState = 'playing';
 		logIt('Started the insanity...');
 
-		clearInterval(gameLoop);
-
 		clices.forEach((entry) => {
 			trackCounts[entry.id] = 0;
 		});
@@ -187,6 +185,8 @@
 				});
 			});
 
+			clearInterval(gameLoop);
+			logIt("Started 'game loop'");
 			gameLoop = setInterval(() => {
 				spawners.forEach((spawner) => {
 					if (trackCounts[spawner.id] >= spawner.orca.maxInstances) {
@@ -403,6 +403,8 @@
 			<div class="mt-5">
 				<button class="bg-amber-950 p-2" onclick={endInsanity}>Stop the insanity</button>
 			</div>
+
+			<a href="/" class="text-yellow-500 hover:underline">Denny, let's go hoooome.</a>
 		{/if}
 	</div>
 </div>
