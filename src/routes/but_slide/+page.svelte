@@ -387,7 +387,7 @@
 			{/if}
 
 			<div class="bottom-5 left-5 mt-5 text-lg text-slate-500 md:absolute md:mt-0">
-				2025-04-12 dynamodb
+				2025-04-12 dragon
 			</div>
 		{:else}
 			<div
