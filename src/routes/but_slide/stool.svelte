@@ -187,9 +187,9 @@
 			/>
 			<span title="Loop"></span>L
 
-			<!-- <div class="mt-1 ml-1 inline-block align-middle text-slate-300">
+			<div class="mt-1 ml-1 inline-block align-middle text-slate-300">
 				{#if props.muted}
-					<button aria-label="Mute" onclick={() => props.onToggleMute()} class="text-yellow-500">
+					<button aria-label="Mute" onclick={() => props.onToggleMute()} class="text-yellow-500 absolute bottom-1 right-1">
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							fill="none"
@@ -206,7 +206,7 @@
 						</svg>
 					</button>
 				{:else}
-					<button aria-label="Unmute" onclick={() => props.onToggleMute()} class="text-green-500">
+					<button aria-label="Unmute" onclick={() => props.onToggleMute()} class="text-green-500 absolute bottom-1 right-1">
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							fill="none"
@@ -223,7 +223,7 @@
 						</svg>
 					</button>
 				{/if}
-			</div> -->
+			</div>
 
 			<button
 				onclick={() => props.onDelete()}
@@ -269,7 +269,7 @@
 				{#if props.orca.startType == 'random'}
 					<div class="mt-3">
 						<label class="grid grid-cols-2">
-							<span class="mt-2">Max simultaneous instances?</span>
+							<span class="mt-2">Max simultaneous instances</span>
 							<input
 								type="number"
 								max="10"
