@@ -2,8 +2,11 @@
 	import { SLOW_C as tracklist } from '$lib/tracklist';
 	import dayjs from 'dayjs';
 	import Stool from './stool.svelte';
+	import { nanoid } from 'nanoid';
+	import { random } from 'lodash';
 
 	interface IClice {
+		id: string;
 		audioFile: string;
 		label: string;
 		paused: boolean;
@@ -11,45 +14,165 @@
 		currentTime: number;
 		volume: number;
 		muted: boolean;
+		loop: boolean;
+
+		orca: {
+			startType: string;
+			maxInstances: number;
+			dieRoll: number;
+		};
 	}
 
 	let selectedTrack = $state('/butts/ambience.mp3');
 	let clices: IClice[] = $state([]);
 	let logs: string[] = $state([]);
 
+	let gameLoop: any = $state(null);
+	let gameRefs: any[] = $state([]);
+	let trackCounts: any = $state({});
+
 	let editorState = $state('editing');
 	const formatTrack = (track: string) => {
 		return track.split('/').slice(-1)[0];
 	};
 
-	const addTrack = () => {
+	const addClice = () => {
+		const ambience = formatTrack(selectedTrack) == 'ambience.mp3';
+
 		clices.push({
+			id: nanoid(8),
 			audioFile: selectedTrack,
 			label: formatTrack(selectedTrack),
 			paused: true,
 			duration: NaN,
 			currentTime: 0,
 			volume: 1,
-			muted: false
+			muted: false,
+			loop: ambience,
+
+			orca: {
+				startType: ambience ? 'onload' : 'random',
+				maxInstances: 1,
+				dieRoll: 69
+			}
 		});
 	};
 
 	const startInsanity = () => {
+		logs = [];
+		trackCounts = {};
 		editorState = 'playing';
 		logIt('Started the insanity...');
+
+		clearInterval(gameLoop);
+
+		clices.forEach((entry) => {
+			trackCounts[entry.id] = 0;
+		});
+
+		const distinctTracks = clices.reduce((acc: any, entry) => {
+			acc[entry.audioFile] = true;
+			return acc;
+		}, {});
+
+		logIt(`Preloading distinct tracks...`);
+		let activelyLoading = 0;
+
+		Object.keys(distinctTracks).forEach((audioFile) => {
+			logIt(`Preloading track ${audioFile}`);
+			const temp = new Audio(audioFile);
+			activelyLoading++;
+
+			temp.addEventListener('canplaythrough', () => {
+				activelyLoading--;
+				checkIfLoaded();
+			});
+		});
+
+		const checkIfLoaded = () => {
+			if (activelyLoading <= 0) {
+				movingOnOverToTheBreakdownLane();
+			}
+		};
+
+		const movingOnOverToTheBreakdownLane = () => {
+			const loaders = clices.filter((entry) => entry.orca.startType == 'onload');
+			const spawners = clices.filter((entry) => entry.orca.startType == 'random');
+
+			logIt(`Processing loaders...`);
+			loaders.forEach((loader) => {
+				logIt(`Playing ${loader.audioFile} ${loader.id} (onload), loop=${loader.loop}`);
+				const audioElm = new Audio(loader.audioFile);
+				audioElm.loop = loader.loop;
+				audioElm.play();
+
+				audioElm.addEventListener('ended', () => {
+					logIt(`Track ended: ${loader.audioFile} ${loader.id}`);
+				});
+
+				gameRefs.push({
+					clice: loader,
+					audio: audioElm
+				});
+			});
+
+			gameLoop = setInterval(() => {
+				// if (random(1, 1) == 1) {
+				// 	logIt('Heh');
+				// 	logIt('Heh');
+				// 	logIt('Heh');
+				// 	logIt('Heh');
+
+				// }
+
+				spawners.forEach((spawner) => {
+					if (trackCounts[spawner.id] >= spawner.orca.maxInstances) {
+						return;
+					}
+
+					const dieRoll = random(1, spawner.orca.dieRoll);
+					if (dieRoll == spawner.orca.dieRoll) {
+						const audioElm = new Audio(spawner.audioFile);
+						trackCounts[spawner.id]++;
+
+						logIt(
+							`Spawning ${spawner.audioFile} ${spawner.id} from dieRoll=${dieRoll}, instances=${trackCounts[spawner.id]}`
+						);
+
+						// probably shouldn't allow the loop
+						audioElm.loop = spawner.loop;
+						audioElm.play();
+
+						gameRefs.push({
+							clice: spawner,
+							audio: audioElm
+						});
+
+						audioElm.addEventListener('ended', () => {
+							trackCounts[spawner.id]--;
+						});
+					}
+				});
+			}, 1000);
+		};
 	};
 
 	const endInsanity = () => {
 		editorState = 'editing';
 		logIt('Ended the insanity...');
+		clearInterval(gameLoop);
+
+		gameRefs.forEach((ref) => {
+			ref.audio.pause();
+		});
 	};
 
 	const logIt = (mess: string) => {
 		logs.push(dayjs().format('h:mm:ss A') + ': ' + mess);
 	};
 
-	const onTogglePause = (entry: IClice) => {
-		entry.paused = !entry.paused;
+	const onDelete = (trashed: IClice) => {
+		clices = clices.filter((entry) => entry != trashed);
 	};
 </script>
 
@@ -72,7 +195,7 @@
 				{/each}
 			</select>
 
-			<button class="align-middle text-green-500" aria-label="Add track" onclick={addTrack}>
+			<button class="align-middle text-green-500" aria-label="Add track" onclick={addClice}>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					fill="none"
@@ -94,18 +217,28 @@
 						bind:paused={entry.paused}
 						bind:volume={entry.volume}
 						bind:muted={entry.muted}
+						onended={() => {
+							entry.currentTime = 0;
+						}}
+						loop={entry.loop}
 					></audio>
 					<Stool
 						{...entry}
-						onTogglePause={() => onTogglePause(entry)}
-						onSeek={() => {}}
+						onTogglePause={() => (entry.paused = !entry.paused)}
+						onSeek={(newTime: number) => (entry.currentTime = newTime)}
+						onLoopChange={() => (entry.loop = !entry.loop)}
+						onDelete={() => onDelete(entry)}
+						onToggleMute={() => (entry.muted = !entry.muted)}
+						onChangeStartType={(newValue: string) => (entry.orca.startType = newValue)}
+						onChangeMaxInstances={(newValue: number) => (entry.orca.maxInstances = newValue)}
+						onChangeDieRoll={(newValue: number) => (entry.orca.dieRoll = newValue)}
 					/>
 				{/each}
 			</div>
 
 			{#if clices.length > 0}
 				<div class="mt-5">
-					<button class="bg-orange-700 p-2" onclick={startInsanity}> Aw let aw blow </button>
+					<button class="bg-orange-700 p-2" onclick={startInsanity}> Drawp it </button>
 				</div>
 			{/if}
 
@@ -119,7 +252,7 @@
 				{/each}
 			</div>
 			<div class="mt-5">
-				<button class="bg-amber-950 p-2" onclick={endInsanity}>Go Back</button>
+				<button class="bg-amber-950 p-2" onclick={endInsanity}>Stop the insanity</button>
 			</div>
 		{/if}
 	</div>
