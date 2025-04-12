@@ -71,6 +71,10 @@
 	<div>
 		<a href="/but" class="text-red-300 hover:underline">Heh</a>
 	</div>
+
+	<div>
+		<a href="/but_slide" class="text-red-300 hover:underline">Heh (Heh)</a>
+	</div>
 </div>
 
 <style scoped>

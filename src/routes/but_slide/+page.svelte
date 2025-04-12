@@ -185,7 +185,7 @@
 </svelte:head>
 
 <div class="butterfly-garden relative bg-slate-900 xl:flex">
-	<img class="xl:h-[100vh]" src="/butts/image.webp" alt="Butterfly" />
+	<img class="xl:h-[85vh] 2xl:h-[100vh]" src="/butts/image.webp" alt="Butterfly" />
 
 	<div class="w-full border border-solid border-black p-5 text-lg">
 		{#if editorState == 'editing'}
@@ -247,7 +247,7 @@
 
 			<div class="absolute bottom-5 left-5 text-lg text-slate-500">2025-04-11 latenightradio HEH</div>
 		{:else}
-			<div class="h-[90vh] overflow-y-scroll bg-slate-500 p-2 text-black" bind:this={logsDiv}>
+			<div class="h-[75vh] 2xl:h-[90vh] overflow-y-scroll bg-slate-500 p-2 text-black" bind:this={logsDiv}>
 				{#each logs as log}
 					<div>
 						{log}
