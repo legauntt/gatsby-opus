@@ -32,6 +32,8 @@
 	let gameRefs: any[] = $state([]);
 	let trackCounts: any = $state({});
 
+	let dragon = $state(false);
+
 	// svelte-ignore non_reactive_update
 	let logsDiv: HTMLDivElement;
 
@@ -47,13 +49,17 @@
 		return track.split('/').slice(-1)[0];
 	};
 
-	const loadFromFile = () => {
+	const onFileChange = () => {
 		const file = fileInput?.files?.[0];
 		if (!file) {
 			fileInputError = 'No file';
 			return;
 		}
 
+		loadFromFile(file);
+	};
+
+	const loadFromFile = (file: any) => {
 		const reader = new FileReader();
 
 		reader.onload = (e: any) => {
@@ -238,6 +244,33 @@
 	const onDelete = (trashed: IClice) => {
 		clices = clices.filter((entry) => entry != trashed);
 	};
+
+	const drawp = (e: any) => {
+		stopDefaults(e);
+		dragon = false;
+
+		const file = e.dataTransfer.files?.[0];
+		if (!file) {
+			return;
+		}
+
+		loadFromFile(file);
+	};
+
+	const dragover = (e: any) => {
+		stopDefaults(e);
+		dragon = true;
+	};
+
+	const dragleave = (e: any) => {
+		stopDefaults(e);
+		dragon = false;
+	};
+
+	const stopDefaults = (e: any) => {
+		e.stopPropagation();
+		e.preventDefault();
+	};
 </script>
 
 <svelte:head>
@@ -245,7 +278,14 @@
 	<meta name="description" content="Woooooooooah" />
 </svelte:head>
 
-<div class="butterfly-garden relative bg-slate-900 xl:flex">
+<div
+	class="butterfly-garden relative bg-slate-900 xl:flex"
+	class:dropIt={dragon}
+	ondragleave={dragleave}
+	ondragover={dragover}
+	ondrop={drawp}
+	role="application"
+>
 	<img class="xl:h-[85vh] 2xl:h-[100vh]" src="/butts/image.webp" alt="Butterfly" />
 
 	<div class="w-full border border-solid border-black px-5 text-lg">
@@ -264,7 +304,7 @@
 							bind:this={fileInput}
 							class="bg-transparent file:mr-5 file:border-[1px] file:bg-stone-50 file:px-3 file:py-1 file:text-xs file:font-medium file:text-stone-700"
 							accept="text/plain"
-							onchange={loadFromFile}
+							onchange={onFileChange}
 						/>
 
 						<button type="button" class="p-2 text-orange-500" onclick={() => (showFile = false)}
@@ -370,5 +410,9 @@
 <style scoped>
 	.butterfly-garden {
 		font-size: 0;
+	}
+
+	.dropIt {
+		opacity: 0.5;
 	}
 </style>
