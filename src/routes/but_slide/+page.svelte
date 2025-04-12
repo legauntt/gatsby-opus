@@ -4,6 +4,7 @@
 	import Stool from './stool.svelte';
 	import { nanoid } from 'nanoid';
 	import { random } from 'lodash';
+	import { tick } from 'svelte';
 
 	interface IClice {
 		id: string;
@@ -30,6 +31,9 @@
 	let gameLoop: any = $state(null);
 	let gameRefs: any[] = $state([]);
 	let trackCounts: any = $state({});
+
+	// svelte-ignore non_reactive_update
+	let logsDiv: HTMLDivElement;
 
 	let editorState = $state('editing');
 	const formatTrack = (track: string) => {
@@ -117,14 +121,6 @@
 			});
 
 			gameLoop = setInterval(() => {
-				// if (random(1, 1) == 1) {
-				// 	logIt('Heh');
-				// 	logIt('Heh');
-				// 	logIt('Heh');
-				// 	logIt('Heh');
-
-				// }
-
 				spawners.forEach((spawner) => {
 					if (trackCounts[spawner.id] >= spawner.orca.maxInstances) {
 						return;
@@ -167,8 +163,15 @@
 		});
 	};
 
-	const logIt = (mess: string) => {
+	const logIt = async (mess: string) => {
 		logs.push(dayjs().format('h:mm:ss A') + ': ' + mess);
+		await tick();
+
+		if (!logsDiv) {
+			return;
+		}
+
+		logsDiv.scroll({ top: logsDiv.scrollHeight, behavior: 'smooth' });
 	};
 
 	const onDelete = (trashed: IClice) => {
@@ -244,7 +247,7 @@
 
 			<div class="absolute bottom-5 left-5 text-lg text-slate-500">2025-04-11 latenightradio</div>
 		{:else}
-			<div class="bg-slate-500 p-2 text-black">
+			<div class="h-[90vh] overflow-y-scroll bg-slate-500 p-2 text-black" bind:this={logsDiv}>
 				{#each logs as log}
 					<div>
 						{log}
