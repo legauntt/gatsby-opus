@@ -46,6 +46,7 @@ export const TREASURE_TROVE = {
 		'pullin_doublexl.mp3',
 		'pullin_large.mp3',
 		'strawng.mp3',
-		'woah.mp3'
+		'woah.mp3',
+		'yehyehyehyow.mp3'
 	].map((entry) => `/butts/${entry}`)
 };
