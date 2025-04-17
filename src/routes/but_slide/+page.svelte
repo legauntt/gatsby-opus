@@ -9,6 +9,7 @@
 	import { random } from 'lodash';
 	import { onMount, tick } from 'svelte';
 	import axios from 'axios';
+	import toast from 'svelte-5-french-toast';
 
 	// @ts-ignore - added by vite
 	const buildTime = dayjs(__BUILD_TIME__).format('YYYY-MM-DD HH:mm:ss');
@@ -51,6 +52,7 @@
 	let rockAndRoll = $state(false);
 	let fullScreen = $state(false);
 	let gameLoopStartTime = $state(0);
+	let loading = $state(false);
 
 	onMount(async () => {
 		const worker = new Worker('/workWork.js');
@@ -60,7 +62,9 @@
 
 		if (shareName) {
 			try {
+				loading = true;
 				const response = await axios.get(`${PUBLIC_BACKEND_BASE_URL}/gatsby/presets/${shareName}`);
+				loading = false;
 				const preset = response.data.preset || {};
 				title = preset.title;
 				clices = preset.clices;
@@ -109,7 +113,7 @@
 				}
 			});
 
-			console.log('Cloud response', response.data);
+			toast.success('Saved!');
 
 			if (response.data.preset.shareName) {
 				page.url.searchParams.set('s', response.data.preset.shareName);
@@ -117,6 +121,7 @@
 			}
 		} catch (e) {
 			console.error(`Failed to save preset`, e);
+			toast.error('Failed to save');
 		}
 	};
 
@@ -365,6 +370,10 @@
 					</svg>
 				</button>
 			</div>
+
+			{#if loading}
+				<div class="mt-3 text-4xl text-slate-500">Loading preset...</div>
+			{/if}
 
 			<div class="mt-5">
 				{#each clices as entry}
