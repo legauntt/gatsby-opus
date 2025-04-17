@@ -10,6 +10,9 @@
 	import { onMount, tick } from 'svelte';
 	import axios from 'axios';
 
+	// @ts-ignore - added by vite
+	const buildTime = dayjs(__BUILD_TIME__).format('YYYY-MM-DD HH:mm:ss');
+
 	const shareName = page.url.searchParams.get('s') || '';
 
 	interface IClice {
@@ -413,7 +416,7 @@
 		{/if}
 
 		<div class="bottom-5 left-5 mt-5 text-lg text-slate-500 md:absolute md:mt-0">
-			2025-04-16 dynamodb
+			{buildTime}
 		</div>
 	</div>
 </div>
