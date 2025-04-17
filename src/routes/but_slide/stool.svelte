@@ -1,9 +1,10 @@
 <script lang="ts">
+	import { TREASURE_TROVE } from '$lib/cetlist';
 	import Wavey from '$lib/comps/wavey.svelte';
-	import { formatTime } from '$lib/utilz';
+	import { formatTime, formatTrack } from '$lib/utilz';
 
 	interface IStoolProps {
-		label: string;
+		audioFile: string;
 		paused: boolean;
 		currentTime: number;
 		muted: boolean;
@@ -18,11 +19,14 @@
 		onChangeStartType: Function;
 		onChangeMaxInstances: Function;
 		onChangeDieRoll: Function;
+		onChangeTrack: Function;
+		onChangeDelay: Function;
 
 		orca: {
 			startType: string;
 			maxInstances: number;
 			dieRoll: number;
+			delay: number;
 		};
 	}
 
@@ -44,6 +48,17 @@
 		props.onChangeMaxInstances(value);
 	};
 
+	const verifyDelay = (e: any) => {
+		let value = Number(e.currentTarget.value);
+		if (isNaN(value)) {
+			value = 1;
+		} else if (value <= 0) {
+			value = 1;
+		}
+
+		props.onChangeDelay(value);
+	};
+
 	const verifyDieRoll = (e: any) => {
 		let value = Number(e.currentTarget.value);
 		if (isNaN(value)) {
@@ -54,10 +69,33 @@
 
 		props.onChangeDieRoll(value);
 	};
+
+	/**
+	 *
+	 * @param e
+	 */
+	const changeTrack = (e: any) => {
+		if (!props.paused) {
+			props.onTogglePause();
+		}
+
+		props.onChangeTrack(e.currentTarget.value);
+	};
 </script>
 
 <div class="relative mt-5 items-center border border-solid border-indigo-500 py-2 select-none">
 	<div>
+		<div class="pl-3">
+			<select
+				class="border border-solid border-slate-500 bg-black p-2 align-middle"
+				onchange={(e) => changeTrack(e)}
+				value={props.audioFile}
+			>
+				{#each TREASURE_TROVE.CLICES as track}
+					<option value={track}>{formatTrack(track)}</option>
+				{/each}
+			</select>
+		</div>
 		<div class="flex">
 			<Wavey {...props} />
 			<div class="mt-5 ml-3 w-16">
@@ -152,11 +190,25 @@
 							onchange={(e) => props.onChangeStartType(e.currentTarget.value)}
 						>
 							<option value="onload">On Load</option>
-							<option value="onload_delay" disabled>After delay...</option>
+							<option value="onload_delay">On Load (delay)</option>
 							<option value="random">Based on random chance</option>
 						</select>
 					</label>
 				</div>
+
+				{#if props.orca.startType == 'onload_delay'}
+					<div class="mt-3">
+						<label class="grid grid-cols-2">
+							<span class="mt-2">Delay seconds:</span>
+							<input
+								type="number"
+								max="10"
+								value={props.orca.delay}
+								onchange={verifyDelay}
+							/>
+						</label>
+					</div>
+				{/if}
 
 				{#if props.orca.startType == 'random'}
 					<div class="mt-3">
