@@ -1,5 +1,3 @@
-console.log('Wooooooooah');
-
 let lastTick = null;
 let tick = 0;
 
