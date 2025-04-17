@@ -139,8 +139,6 @@
 		</div>
 
 		<div class="w-full">
-			<div>{props.label}</div>
-
 			{#if props.subslice}
 				<div
 					class="relative h-6 rounded-2xl bg-slate-700"

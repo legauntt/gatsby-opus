@@ -1,10 +1,16 @@
 <script lang="ts">
-	import { TREASURE_TROVE } from '$lib/cetlist';
+	import { PUBLIC_BACKEND_BASE_URL } from '$env/static/public';
+	import { pushState } from '$app/navigation';
+
+	import { page } from '$app/state';
 	import dayjs from 'dayjs';
 	import Stool from './stool.svelte';
 	import { nanoid } from 'nanoid';
 	import { random } from 'lodash';
 	import { onMount, tick } from 'svelte';
+	import axios from 'axios';
+
+	const shareName = page.url.searchParams.get('s') || '';
 
 	interface IClice {
 		id: string;
@@ -16,11 +22,13 @@
 		volume: number;
 		muted: boolean;
 		loop: boolean;
+		played: boolean;
 
 		orca: {
 			startType: string;
 			maxInstances: number;
 			dieRoll: number;
+			delay: number;
 		};
 	}
 
@@ -31,89 +39,36 @@
 	let gameRefs: any[] = $state([]);
 	let trackCounts: any = $state({});
 
-	let dragon = $state(false);
-
 	// svelte-ignore non_reactive_update
 	let logsDiv: HTMLDivElement;
 
-	// svelte-ignore non_reactive_update
-	let fileInput: HTMLInputElement;
-
-	let showFile = $state(false);
 	let title = $state('');
-	let fileInputError = $state('');
 
 	let editorState = $state('editing');
 	let rockAndRoll = $state(false);
+	let fullScreen = $state(false);
+	let gameLoopStartTime = $state(0);
 
-	onMount(() => {
+	onMount(async () => {
 		const worker = new Worker('/workWork.js');
 		worker.onmessage = (e) => {
-			console.log('mess', e.data);
 			gameLoop();
 		};
+
+		if (shareName) {
+			try {
+				const response = await axios.get(`${PUBLIC_BACKEND_BASE_URL}/gatsby/presets/${shareName}`);
+				const preset = response.data.preset || {};
+				title = preset.title;
+				clices = preset.clices;
+			} catch (e) {
+				console.error(`Failed to load preset`, e);
+			}
+		}
 	});
 
 	const formatTrack = (track: string) => {
 		return track.split('/').slice(-1)[0];
-	};
-
-	const onFileChange = () => {
-		const file = fileInput?.files?.[0];
-		if (!file) {
-			fileInputError = 'No file';
-			return;
-		}
-
-		loadFromFile(file);
-	};
-
-	const loadFromFile = (file: any) => {
-		const reader = new FileReader();
-
-		reader.onload = (e: any) => {
-			const contents = e.target.result;
-			try {
-				const parsedContents = JSON.parse(contents);
-
-				if (!Array.isArray(parsedContents.clices)) {
-					fileInputError = `Invalid format - no clices`;
-					return;
-				}
-
-				title = parsedContents.title || '';
-				clices = parsedContents.clices || [];
-				showFile = false;
-			} catch (e) {
-				console.error(`Failed to parse JSON`, e);
-			}
-		};
-
-		reader.readAsText(file);
-	};
-
-	const saveToFile = async () => {
-		const data = {
-			version: '2025-04-12',
-			title,
-			abzolutely: true,
-			clices
-		};
-
-		const json = JSON.stringify(data, null, 4);
-		const blob = new Blob([json], { type: 'application/json' });
-		const url = URL.createObjectURL(blob);
-
-		// Create the anchor element in memory
-		const a = document.createElement('a');
-		a.href = url;
-		a.download = 'dynamodb-fotabip.txt';
-
-		// Programmatically trigger the download
-		a.click();
-
-		// Cleanup
-		URL.revokeObjectURL(url);
 	};
 
 	const addClice = () => {
@@ -129,16 +84,41 @@
 			volume: 1,
 			muted: false,
 			loop: ambience,
+			played: false,
 
 			orca: {
 				startType: ambience ? 'onload' : 'random',
 				maxInstances: 1,
-				dieRoll: 69
+				dieRoll: 69,
+				delay: 30
 			}
 		});
 	};
 
+	const saveToCloud = async () => {
+		try {
+			const response = await axios.post(`${PUBLIC_BACKEND_BASE_URL}/gatsby/presets`, {
+				preset: {
+					version: '2025-04-16',
+					abzolutely: true,
+					title: title,
+					clices
+				}
+			});
+
+			console.log('Cloud response', response.data);
+
+			if (response.data.preset.shareName) {
+				page.url.searchParams.set('s', response.data.preset.shareName);
+				pushState(page.url, {});
+			}
+		} catch (e) {
+			console.error(`Failed to save preset`, e);
+		}
+	};
+
 	const startInsanity = () => {
+		fullScreen = true;
 		logs = [];
 		trackCounts = {};
 		editorState = 'playing';
@@ -194,6 +174,7 @@
 			});
 
 			rockAndRoll = true;
+			gameLoopStartTime = Date.now();
 		};
 	};
 
@@ -202,8 +183,33 @@
 			return;
 		}
 
-		const spawners = clices.filter((entry) => entry.orca.startType == 'random');
+		const spawners = clices.filter((entry) => entry.orca.startType != 'onload');
 		spawners.forEach((spawner) => {
+			if (spawner.orca.startType == 'onload_delay' && !spawner.played) {
+				const diff = Math.floor((Date.now() - gameLoopStartTime) / 1000);
+
+				if (diff >= spawner.orca.delay) {
+					spawner.played = true;
+
+					const audioElm = new Audio(spawner.audioFile);
+
+					logIt(`Spawning ${spawner.audioFile} ${spawner.id} from delay`);
+
+					// probably shouldn't allow the loop
+					audioElm.loop = spawner.loop;
+					audioElm.play();
+
+					gameRefs.push({
+						clice: spawner,
+						audio: audioElm
+					});
+
+					audioElm.addEventListener('ended', () => {
+						// ...
+					});
+				}
+			}
+
 			if (trackCounts[spawner.id] >= spawner.orca.maxInstances) {
 				return;
 			}
@@ -234,6 +240,7 @@
 	};
 
 	const endInsanity = () => {
+		fullScreen = false;
 		editorState = 'editing';
 		logIt('Ended the insanity...');
 		rockAndRoll = false;
@@ -257,33 +264,6 @@
 	const onDelete = (trashed: IClice) => {
 		clices = clices.filter((entry) => entry != trashed);
 	};
-
-	const drawp = (e: any) => {
-		stopDefaults(e);
-		dragon = false;
-
-		const file = e.dataTransfer.files?.[0];
-		if (!file) {
-			return;
-		}
-
-		loadFromFile(file);
-	};
-
-	const dragover = (e: any) => {
-		stopDefaults(e);
-		dragon = true;
-	};
-
-	const dragleave = (e: any) => {
-		stopDefaults(e);
-		dragon = false;
-	};
-
-	const stopDefaults = (e: any) => {
-		e.stopPropagation();
-		e.preventDefault();
-	};
 </script>
 
 <svelte:head>
@@ -291,75 +271,92 @@
 	<meta name="description" content="Woooooooooah" />
 </svelte:head>
 
-<div
-	class="butterfly-garden relative bg-slate-900 xl:flex"
-	class:dropIt={dragon}
-	ondragleave={dragleave}
-	ondragover={dragover}
-	ondrop={drawp}
-	role="application"
->
-	<img class="xl:h-[85vh] 2xl:h-[100vh]" src="/butts/image.webp" alt="Butterfly" />
+<div class="butterfly-garden relative bg-slate-900 xl:flex" role="application">
+	<img
+		class="xl:h-[85vh] 2xl:h-[100vh]"
+		src="/butts/image.webp"
+		alt="Butterfly"
+		class:butto={editorState != 'editing'}
+	/>
 
-	<div class="w-full border border-solid border-black px-5 text-lg">
-		{#if editorState == 'editing'}
-			<div>
-				{#if showFile}
-					{#if fileInputError}
-						<div class="p-2 text-red-500">
-							{fileInputError}
-						</div>
-					{/if}
-					<div>
-						<input
-							type="file"
-							name="ncis"
-							bind:this={fileInput}
-							class="bg-transparent file:mr-5 file:border-[1px] file:bg-stone-50 file:px-3 file:py-1 file:text-xs file:font-medium file:text-stone-700"
-							accept="text/plain"
-							onchange={onFileChange}
-						/>
-
-						<button type="button" class="p-2 text-orange-500" onclick={() => (showFile = false)}
-							>SHIT</button
-						>
-					</div>
-				{:else}
-					<button type="button" class="p-2 text-orange-500" onclick={() => (showFile = true)}
-						>DynamoDB</button
-					>
-				{/if}
+	{#if editorState != 'editing'}
+		{#if fullScreen}
+			<div class="absolute top-5 left-5 text-2xl text-black">
+				<button class="bg-slate-300 p-2" onclick={() => (fullScreen = false)}> Show logs </button>
 			</div>
 
-			<div>
+			<div class="absolute top-5 right-5 text-2xl text-black">
+				<button class="bg-violet-300 p-2" onclick={endInsanity}> Stop it </button>
+			</div>
+		{:else}
+			<div class="absolute top-5 left-5 text-2xl text-black">
+				<button class="bg-slate-300 p-2" onclick={() => (fullScreen = true)}> Hide logs </button>
+			</div>
+		{/if}
+	{/if}
+
+	<div class="w-full border border-solid border-black px-5 text-lg" class:buttMax={fullScreen}>
+		{#if editorState == 'editing'}
+			<div class="mt-3">
 				<input
 					type="text"
 					bind:value={title}
-					class="w-full border border-solid border-slate-500 bg-black p-2 align-middle text-sm"
+					class="w-[calc(100%-130px)] border border-solid border-slate-500 bg-black p-2 align-middle text-sm"
 					placeholder="Untitled"
 				/>
-			</div>
-
-			<div class="mt-3">
-				<select
-					class="border border-solid border-slate-500 bg-black p-2 align-middle"
-					bind:value={selectedTrack}
-				>
-					{#each TREASURE_TROVE.CLICES as track}
-						<option value={track}>{formatTrack(track)}</option>
-					{/each}
-				</select>
 
 				<button class="align-middle text-green-500" aria-label="Add track" onclick={addClice}>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
-						fill="none"
 						viewBox="0 0 24 24"
-						stroke-width="1.5"
-						stroke="currentColor"
-						class="size-6"
+						fill="currentColor"
+						class="size-8"
 					>
-						<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+						<path
+							fill-rule="evenodd"
+							d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z"
+							clip-rule="evenodd"
+						/>
+					</svg>
+				</button>
+
+				<button
+					aria-label="Play"
+					class="disabled align-middle text-red-500 disabled:text-slate-500"
+					onclick={startInsanity}
+					disabled={clices.length == 0}
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						viewBox="0 0 24 24"
+						fill="currentColor"
+						class="size-8"
+					>
+						<path
+							fill-rule="evenodd"
+							d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z"
+							clip-rule="evenodd"
+						/>
+					</svg>
+				</button>
+
+				<button
+					aria-label="Save"
+					class="align-middle text-blue-400 disabled:text-slate-500"
+					disabled={clices.length == 0}
+					onclick={saveToCloud}
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						viewBox="0 0 24 24"
+						fill="currentColor"
+						class="size-8"
+					>
+						<path
+							fill-rule="evenodd"
+							d="M6 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V6a3 3 0 0 0-3-3H6Zm1.5 1.5a.75.75 0 0 0-.75.75V16.5a.75.75 0 0 0 1.085.67L12 15.089l4.165 2.083a.75.75 0 0 0 1.085-.671V5.25a.75.75 0 0 0-.75-.75h-9Z"
+							clip-rule="evenodd"
+						/>
 					</svg>
 				</button>
 			</div>
@@ -388,18 +385,13 @@
 						onChangeStartType={(newValue: string) => (entry.orca.startType = newValue)}
 						onChangeMaxInstances={(newValue: number) => (entry.orca.maxInstances = newValue)}
 						onChangeDieRoll={(newValue: number) => (entry.orca.dieRoll = newValue)}
+						onChangeTrack={(newTrack: string) => (entry.audioFile = newTrack)}
+						onChangeDelay={(newValue: number) => (entry.orca.delay = newValue)}
 					/>
 				{/each}
 			</div>
 
-			{#if clices.length > 0}
-				<div class="mt-5">
-					<button class="bg-orange-700 p-2" onclick={startInsanity}> MAW BEAUTIFUL </button>
-					<button class="ml-3 bg-violet-700 p-2" onclick={saveToFile}>Bowlin' Chain </button>
-				</div>
-			{/if}
-
-			<a href="/" class="ml-3 text-yellow-500 hover:underline">Denny, let's go hoooome.</a>
+			<a href="/" class="mt-5 ml-3 text-yellow-200 hover:underline">Denny, let's go hoooome.</a>
 		{:else}
 			<div
 				class="h-[75vh] overflow-y-scroll bg-slate-500 p-2 text-black 2xl:h-[90vh]"
@@ -419,7 +411,7 @@
 		{/if}
 
 		<div class="bottom-5 left-5 mt-5 text-lg text-slate-500 md:absolute md:mt-0">
-			2025-04-12 peon
+			2025-04-16 dynamodb
 		</div>
 	</div>
 </div>
@@ -429,7 +421,11 @@
 		font-size: 0;
 	}
 
-	.dropIt {
-		opacity: 0.5;
+	.butto {
+		width: 100%;
+	}
+
+	.buttMax {
+		display: none;
 	}
 </style>

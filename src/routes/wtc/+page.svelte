@@ -18,6 +18,11 @@
 	let duration = $state(loopDuration);
 
 	onMount(() => {
+		const worker = new Worker('/work_faster.js');
+		worker.onmessage = (e) => {
+			timerLoop();
+		};
+
 		if (!trackName) {
 			return;
 		}
@@ -26,7 +31,7 @@
 
 		for (const [key, tracks] of Object.entries(TREASURE_TROVE)) {
 			const track = tracks.find((entry) => {
-				const name = entry.split('/').slice(-1)[0].replace(".m4a", "").replace(".mp3", "");
+				const name = entry.split('/').slice(-1)[0].replace('.m4a', '').replace('.mp3', '');
 				// console.log("heh", name, trackName);
 				return name == trackName;
 			});
@@ -43,17 +48,17 @@
 		}
 	});
 
-	setInterval(() => {
-		if (currentTime > startTime + loopDuration) {
-			currentTime = startTime;
-		}
-	}, 100);
-
 	const onTogglePause = () => {
 		paused = !paused;
 	};
 
 	const onSeek = () => {};
+
+	const timerLoop = () => {
+		if (currentTime > startTime + loopDuration) {
+			currentTime = startTime;
+		}
+	};
 </script>
 
 <svelte:head>
