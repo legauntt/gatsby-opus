@@ -39,6 +39,7 @@
 		"axios": "^1.8.4",
 		"dayjs": "^1.11.13",
 		"lodash": "^4.17.21",
-		"nanoid": "^3.3.11"
+		"nanoid": "^3.3.11",
+		"svelte-5-french-toast": "^2.0.4"
 	}
 }
