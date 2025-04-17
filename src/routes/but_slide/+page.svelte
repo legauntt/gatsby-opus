@@ -126,6 +126,7 @@
 
 		clices.forEach((entry) => {
 			trackCounts[entry.id] = 0;
+			entry.played = false;
 		});
 
 		const distinctTracks = clices.reduce((acc: any, entry) => {
@@ -184,6 +185,7 @@
 		}
 
 		const spawners = clices.filter((entry) => entry.orca.startType != 'onload');
+
 		spawners.forEach((spawner) => {
 			if (spawner.orca.startType == 'onload_delay' && !spawner.played) {
 				const diff = Math.floor((Date.now() - gameLoopStartTime) / 1000);
