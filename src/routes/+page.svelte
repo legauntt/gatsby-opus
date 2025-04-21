@@ -27,18 +27,12 @@
 
 	const onPlayTrack = (tab: string, track: string) => {
 		insanityFactor++;
-
-		if (tab.includes('BONUS')) {
-			discCoverImage = '/lar/20.png';
-		} else if (tab.includes('CLICES')) {
-			discCoverImage = '/lar/but.webp';
-		} else if (tab.includes('SEVEN')) {
-			discCoverImage = '/lar/seven.png';
-		} else {
-			discCoverImage = '/lar/marquee.png';
-		}
-
 		activePlaysByTab[tab]++;
+	};
+
+	const onPauseTrack = (tab: string, track: string) => {
+		insanityFactor--;
+		activePlaysByTab[tab]--;
 	};
 
 	const onEndTrack = (tab: string, track: string) => {
@@ -48,6 +42,16 @@
 
 	const clickTab = (tabName: string) => {
 		activeTab = tabName;
+
+		if (tabName.includes('BONUS')) {
+			discCoverImage = '/lar/20.png';
+		} else if (tabName.includes('CLICES')) {
+			discCoverImage = '/lar/but.webp';
+		} else if (tabName.includes('SEVEN')) {
+			discCoverImage = '/lar/seven.png';
+		} else {
+			discCoverImage = '/lar/marquee.png';
+		}
 	};
 </script>
 
@@ -73,7 +77,9 @@
 				{/each}
 
 				{#if insanityFactor > 2}
-					<button onclick={sanity} class="ml-3 bg-violet-500 p-2 text-white">Make It Stop ({insanityFactor})</button>
+					<button onclick={sanity} class="ml-3 bg-violet-500 p-2 text-white"
+						>Make It Stop ({insanityFactor})</button
+					>
 				{/if}
 			</div>
 
@@ -84,6 +90,7 @@
 							<Glosky
 								{filename}
 								onPlayTrack={(track: string) => onPlayTrack(key, track)}
+								onPauseTrack={(track: string) => onPauseTrack(key, track)}
 								onEndTrack={(track: string) => onEndTrack(key, track)}
 							/>
 						{/each}

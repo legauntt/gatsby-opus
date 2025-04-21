@@ -5,6 +5,7 @@
 	interface IGloskyProps {
 		filename: string;
 		onPlayTrack: Function;
+		onPauseTrack: Function;
 		onEndTrack: Function;
 	}
 
@@ -15,7 +16,7 @@
 
 	const drawpIt = () => {
 		props.onPlayTrack(props.filename);
-		
+
 		waves.push({
 			filename: props.filename,
 			startedAt: new Date(),
@@ -33,6 +34,14 @@
 
 	const onTogglePause = (wave: any) => {
 		wave.paused = !wave.paused;
+
+		if (wave.paused) {
+			props.onPauseTrack(props.filename);
+			activePlays--;
+		} else {
+			props.onPlayTrack(props.filename);
+			activePlays++;
+		}
 	};
 
 	document.addEventListener('pirates_and_traitors', (e) => {
@@ -48,13 +57,13 @@
 </script>
 
 <div>
-	<div class="mb-3 w-256 border border-solid border-slate-500 p-5" class:active={activePlays > 0}>
+	<div class="mb-3 w-256 border border-solid border-slate-500 p-5">
 		<button onclick={drawpIt}>
 			{formatTrack(props.filename)}
 		</button>
 
 		{#each waves as wave}
-			<div>
+			<div class="p-2 my-2" class:active={!wave.paused}>
 				<audio
 					src={props.filename}
 					bind:currentTime={wave.currentTime}
