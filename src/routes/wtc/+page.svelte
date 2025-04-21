@@ -44,6 +44,7 @@
 
 		if (!shareName) {
 			newGlawski();
+			return;
 		}
 
 		try {
@@ -173,7 +174,7 @@
 		<div class="xl:inline-block">
 			<input
 				type="text"
-				class="xl:ml-3 xl:min-w-128 border border-solid border-slate-500 p-2 align-middle"
+				class="border border-solid border-slate-500 p-2 align-middle xl:ml-3 xl:min-w-128"
 				bind:value={glawski.title}
 				placeholder="Yeh I remembaw..."
 			/>
