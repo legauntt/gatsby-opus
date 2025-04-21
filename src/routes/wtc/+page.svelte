@@ -158,41 +158,45 @@
 	></audio>
 
 	<div class="mt-5">
-		<select
-			class="border border-solid border-slate-500 bg-black p-2 align-middle"
-			bind:value={glawski.audioFile}
-			onchange={changedTrack}
-		>
-			{#each allTracks as track}
-				<option value={track}>{formatTrack(track)}</option>
-			{/each}
-		</select>
-
-		<input
-			type="text"
-			class="ml-3 min-w-128 border border-solid border-slate-500 p-2 align-middle"
-			bind:value={glawski.title}
-			placeholder="Yeh I remembaw..."
-		/>
-
-		<button
-			aria-label="Save"
-			class="align-middle text-blue-400 disabled:text-slate-500"
-			onclick={saveGlawski}
-		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				viewBox="0 0 24 24"
-				fill="currentColor"
-				class="size-8"
+		<div class="xl:inline-block">
+			<select
+				class="border border-solid border-slate-500 bg-black p-2 align-middle"
+				bind:value={glawski.audioFile}
+				onchange={changedTrack}
 			>
-				<path
-					fill-rule="evenodd"
-					d="M6 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V6a3 3 0 0 0-3-3H6Zm1.5 1.5a.75.75 0 0 0-.75.75V16.5a.75.75 0 0 0 1.085.67L12 15.089l4.165 2.083a.75.75 0 0 0 1.085-.671V5.25a.75.75 0 0 0-.75-.75h-9Z"
-					clip-rule="evenodd"
-				/>
-			</svg>
-		</button>
+				{#each allTracks as track}
+					<option value={track}>{formatTrack(track)}</option>
+				{/each}
+			</select>
+		</div>
+
+		<div class="xl:inline-block">
+			<input
+				type="text"
+				class="xl:ml-3 xl:min-w-128 border border-solid border-slate-500 p-2 align-middle"
+				bind:value={glawski.title}
+				placeholder="Yeh I remembaw..."
+			/>
+
+			<button
+				aria-label="Save"
+				class="align-middle text-blue-400 disabled:text-slate-500"
+				onclick={saveGlawski}
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					viewBox="0 0 24 24"
+					fill="currentColor"
+					class="size-8"
+				>
+					<path
+						fill-rule="evenodd"
+						d="M6 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V6a3 3 0 0 0-3-3H6Zm1.5 1.5a.75.75 0 0 0-.75.75V16.5a.75.75 0 0 0 1.085.67L12 15.089l4.165 2.083a.75.75 0 0 0 1.085-.671V5.25a.75.75 0 0 0-.75-.75h-9Z"
+						clip-rule="evenodd"
+					/>
+				</svg>
+			</button>
+		</div>
 
 		<Wavey
 			currentTime={glawski.currentTime}
@@ -205,24 +209,28 @@
 
 		<div class="mt-5">
 			<div>
-				<div class="inline-block align-middle">
-					Start
-					<input
-						type="text"
-						class="border border-solid border-slate-500 p-2"
-						value={glawski.start}
-						onchange={updateStartValue}
-					/>
+				<div class="align-middle xl:inline-block">
+					<label class="inline-block">
+						<span class="inline-block w-24">Start</span>
+						<input
+							type="text"
+							class="border border-solid border-slate-500 p-2"
+							value={glawski.start}
+							onchange={updateStartValue}
+						/>
+					</label>
 				</div>
 
-				<div class="ml-5 inline-block align-middle">
-					Duration
-					<input
-						type="text"
-						class="border border-solid border-slate-500 p-2"
-						value={glawski.loopLength}
-						onchange={updateLoopLength}
-					/>
+				<div class="align-middle xl:ml-5 xl:inline-block">
+					<label>
+						<span class="inline-block w-24">Duration</span>
+						<input
+							type="text"
+							class="border border-solid border-slate-500 p-2"
+							value={glawski.loopLength}
+							onchange={updateLoopLength}
+						/>
+					</label>
 				</div>
 			</div>
 		</div>
