@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { TREASURE_TROVE } from '$lib/cetlist';
+	import { tick } from 'svelte';
 	import Glosky from './glosky.svelte';
 
 	const KEYS = ['DEMON', 'BONUS', 'SEVEN', 'CLICES'];
@@ -17,8 +18,10 @@
 		activePlaysByTab[key] = 0;
 	});
 
-	const playAlbum = (album: string) => {
+	const playAlbum = async (album: string) => {
 		sanity();
+		await tick();
+		
 		playingAlbum = album;
 		playingTrackNum = 0;
 		const trackName = TREASURE_TROVE[album][playingTrackNum];
@@ -114,7 +117,7 @@
 							aria-label="Play album"
 							title="Play album"
 							onclick={() => playAlbum(tab)}
-							class="border border-solid border-blue-400 bg-blue-500 p-2 align-middle text-white mr-3"
+							class="mr-3 border border-solid border-blue-400 bg-blue-500 p-2 align-middle text-white"
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"

@@ -58,6 +58,7 @@
 
 		waves.forEach((wave) => {
 			wave.paused = true;
+			wave.currentTime = 0;
 		});
 
 		waves = [];
