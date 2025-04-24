@@ -60,10 +60,16 @@
 		insanityFactor--;
 		activePlaysByTab[tab]--;
 
+		if (playingAlbum == '') {
+			return;
+		}
+
 		playingTrackNum++;
 		const trackName = TREASURE_TROVE[playingAlbum][playingTrackNum];
 		if (!trackName) {
 			console.log(`Album ended`);
+			playingAlbum = '';
+			playingTrackNum = 0;
 			return;
 		}
 
