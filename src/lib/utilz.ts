@@ -1,3 +1,5 @@
+const TRACK_STRACTOR = /^(\d{2}_)(.*)/;
+
 /**
  *
  * @param value
@@ -13,5 +15,12 @@ export const formatTime = (value: number) => {
 };
 
 export const formatTrack = (value: string) => {
-	return value.split('/').slice(-1)[0];
+	let niceTrack = value.split('/').slice(-1)[0].replace('.m4a', '').replace('.mp3', '');
+	const matches = TRACK_STRACTOR.exec(niceTrack);
+
+	if (matches?.length == 3) {
+		niceTrack = matches[2];
+	}
+
+	return niceTrack.toUpperCase();
 };
