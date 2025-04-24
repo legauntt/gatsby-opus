@@ -56,7 +56,7 @@
 </script>
 
 <div class="p-5">
-	<div class="block lg:flex">
+	<div class="block xl:flex">
 		<div>
 			<img src={discCoverImage} alt="Pitchaw on da 20" class="w-[1200px] object-contain lg:h-256" />
 		</div>
