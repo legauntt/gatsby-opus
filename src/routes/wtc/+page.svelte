@@ -52,7 +52,7 @@
 			const response = await axios.get(`${PUBLIC_BACKEND_BASE_URL}/gatsby/glawskis/${shareName}`);
 			loading = false;
 			glawski = response.data.glawski;
-			glawski.currentTime = 0;
+			glawski.currentTime = glawski.start;
 		} catch (e) {
 			console.error(`Failed to load glawski`, e);
 		}
@@ -71,7 +71,7 @@
 	};
 
 	const timerLoop = () => {
-		if (glawski.currentTime > glawski.start + glawski.loopLength) {
+		if (glawski.currentTime >= glawski.start + glawski.loopLength) {
 			glawski.currentTime = glawski.start;
 		}
 	};
@@ -122,6 +122,7 @@
 
 		glawski.currentTime = value;
 		glawski.start = value;
+		capLoopLength();
 	};
 
 	const updateLoopLength = (e: Event) => {
@@ -146,6 +147,7 @@
 			glawski.loopLength = Number((glawski.duration - glawski.start).toFixed(1));
 		}
 	};
+
 </script>
 
 <svelte:head>
