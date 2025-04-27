@@ -44,11 +44,21 @@
 		}
 	};
 
+	document.addEventListener('play_track', (e) => {
+		const message = (e as CustomEvent).detail;
+		// console.log(`Message received:`, message);
+
+		if (message.trackName == props.filename) {
+			drawpIt();
+		}
+	});
+
 	document.addEventListener('pirates_and_traitors', (e) => {
-		console.log(`Message received: ${(e as CustomEvent).detail}`);
+		// console.log(`Message received: ${(e as CustomEvent).detail}`);
 
 		waves.forEach((wave) => {
 			wave.paused = true;
+			wave.currentTime = 0;
 		});
 
 		waves = [];
@@ -63,7 +73,7 @@
 		</button>
 
 		{#each waves as wave}
-			<div class="p-2 my-2" class:active={!wave.paused}>
+			<div class="my-2 p-2" class:active={!wave.paused}>
 				<audio
 					src={props.filename}
 					bind:currentTime={wave.currentTime}
