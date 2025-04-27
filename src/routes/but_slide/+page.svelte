@@ -10,6 +10,7 @@
 	import { onMount, tick } from 'svelte';
 	import axios from 'axios';
 	import toast from 'svelte-5-french-toast';
+	import { copyToClippy } from '$lib/utilz';
 
 	// @ts-ignore - added by vite
 	const buildTime = dayjs(__BUILD_TIME__).format('YYYY-MM-DD HH:mm:ss');
@@ -67,7 +68,11 @@
 				loading = false;
 				const preset = response.data.preset || {};
 				title = preset.title;
-				clices = preset.clices;
+				clices = preset.clices.map((entry: any) => {
+					entry.currentTime = 0;
+					entry.paused = true;
+					return entry;
+				});
 			} catch (e) {
 				console.error(`Failed to load preset`, e);
 			}
@@ -118,6 +123,16 @@
 			if (response.data.preset.shareName) {
 				page.url.searchParams.set('s', response.data.preset.shareName);
 				pushState(page.url, {});
+
+				const clipped = await copyToClippy(page.url.href);
+
+				if (clipped) {
+					toast.success(`Copied URL to Clipboard`);
+				} else {
+					toast.error(`Failed to copy URL to clipboard`);
+				}
+			} else {
+				toast.error(`Unexpected response from backend`);
 			}
 		} catch (e) {
 			console.error(`Failed to save preset`, e);
