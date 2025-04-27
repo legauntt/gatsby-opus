@@ -19,6 +19,8 @@
 		TREASURE_TROVE.CLICES
 	);
 
+	const DEF_LOOP_LEN = 5;
+
 	allTracks.sort((a, b) => {
 		return a.localeCompare(b);
 	});
@@ -28,7 +30,7 @@
 	 */
 	let glawski = $state({
 		start: 0,
-		loopLength: 19,
+		loopLength: DEF_LOOP_LEN,
 		duration: NaN,
 		title: '',
 		audioFile: '',
@@ -77,8 +79,24 @@
 	};
 
 	const newGlawski = () => {
+		// console.log('new glawski');
+
+		glawski = {
+			start: 0,
+			loopLength: DEF_LOOP_LEN,
+			duration: NaN,
+			title: '',
+			audioFile: '',
+			paused: false,
+			currentTime: 0
+		};
+
 		shareName = '';
-		glawski.audioFile = allTracks[0];
+
+		if (page.url.searchParams.get('s')) {
+			page.url.searchParams.delete('s');
+			pushState(page.url, {});
+		}
 	};
 
 	const saveGlawski = async () => {
@@ -138,7 +156,7 @@
 
 	const changedTrack = () => {
 		glawski.start = 0;
-		glawski.loopLength = 19;
+		glawski.loopLength = DEF_LOOP_LEN;
 		capLoopLength();
 	};
 
@@ -147,7 +165,6 @@
 			glawski.loopLength = Number((glawski.duration - glawski.start).toFixed(1));
 		}
 	};
-
 </script>
 
 <svelte:head>
@@ -195,6 +212,23 @@
 				placeholder="Yeh I remembaw..."
 			/>
 
+			<button aria-label="New" class="mr-3 ml-3 align-middle text-green-600" onclick={newGlawski}>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke-width="1.5"
+					stroke="currentColor"
+					class="size-6"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+					/>
+				</svg>
+			</button>
+
 			<button
 				aria-label="Save"
 				class="align-middle text-blue-400 disabled:text-slate-500"
@@ -216,42 +250,44 @@
 			</button>
 		</div>
 
-		<Wavey
-			currentTime={glawski.currentTime}
-			paused={glawski.paused}
-			duration={glawski.duration}
-			{onTogglePause}
-			{onSeek}
-			subslice={{ start: glawski.start, end: glawski.start + glawski.loopLength }}
-		/>
+		{#if glawski.audioFile}
+			<Wavey
+				currentTime={glawski.currentTime}
+				paused={glawski.paused}
+				duration={glawski.duration}
+				{onTogglePause}
+				{onSeek}
+				subslice={{ start: glawski.start, end: glawski.start + glawski.loopLength }}
+			/>
 
-		<div class="mt-5">
-			<div>
-				<div class="align-middle xl:inline-block">
-					<label class="inline-block">
-						<span class="inline-block w-24">Start</span>
-						<input
-							type="text"
-							class="border border-solid border-slate-500 p-2"
-							value={glawski.start}
-							onchange={updateStartValue}
-						/>
-					</label>
-				</div>
+			<div class="mt-5">
+				<div>
+					<div class="align-middle xl:inline-block">
+						<label class="inline-block">
+							<span class="inline-block w-24">Start</span>
+							<input
+								type="text"
+								class="border border-solid border-slate-500 p-2"
+								value={glawski.start}
+								onchange={updateStartValue}
+							/>
+						</label>
+					</div>
 
-				<div class="align-middle xl:ml-5 xl:inline-block">
-					<label>
-						<span class="inline-block w-24">Duration</span>
-						<input
-							type="text"
-							class="border border-solid border-slate-500 p-2"
-							value={glawski.loopLength}
-							onchange={updateLoopLength}
-						/>
-					</label>
+					<div class="align-middle xl:ml-5 xl:inline-block">
+						<label>
+							<span class="inline-block w-24">Duration</span>
+							<input
+								type="text"
+								class="border border-solid border-slate-500 p-2"
+								value={glawski.loopLength}
+								onchange={updateLoopLength}
+							/>
+						</label>
+					</div>
 				</div>
 			</div>
-		</div>
+		{/if}
 	</div>
 
 	<div class="mt-5">
