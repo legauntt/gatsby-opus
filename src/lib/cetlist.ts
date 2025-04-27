@@ -1,4 +1,8 @@
-export const TREASURE_TROVE = {
+interface SimpleMap {
+	[key: string]: string[];
+}
+
+export const TREASURE_TROVE: SimpleMap = {
 	DEMON: [
 		'01_whoir.m4a',
 		'02_glosky.m4a',
