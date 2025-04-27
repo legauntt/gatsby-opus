@@ -6,7 +6,7 @@
 	import { onMount } from 'svelte';
 	import { TREASURE_TROVE } from '$lib/cetlist';
 	import Wavey from '$lib/comps/wavey.svelte';
-	import { formatTrack } from '$lib/utilz';
+	import { copyToClippy, formatTrack } from '$lib/utilz';
 	import toast from 'svelte-5-french-toast';
 
 	let shareName = $state(page.url.searchParams.get('s') || '');
@@ -52,6 +52,7 @@
 			const response = await axios.get(`${PUBLIC_BACKEND_BASE_URL}/gatsby/glawskis/${shareName}`);
 			loading = false;
 			glawski = response.data.glawski;
+			glawski.currentTime = 0;
 		} catch (e) {
 			console.error(`Failed to load glawski`, e);
 		}
@@ -90,11 +91,20 @@
 			saving = false;
 			toast.success('Saved (dat sucka)');
 
-			if (response.data.glawski?.shareName) {
-				page.url.searchParams.set('s', response.data.glawski.shareName);
-				pushState(page.url, {});
+			const shareName = response.data.glawski?.shareName;
+
+			if (!shareName) {
+				toast.error(`Unexpected response from backend`);
+			}
+
+			page.url.searchParams.set('s', shareName);
+			pushState(page.url, {});
+			const clipped = await copyToClippy(page.url.href);
+
+			if (clipped) {
+				toast.success(`Copied URL to Clipboard`);
 			} else {
-				alert('doh');
+				toast.error(`Failed to copy URL to clipboard`);
 			}
 		} catch (e) {
 			toast.error('Damn shame');
@@ -146,6 +156,10 @@
 <div class="p-5">
 	<div class="text-3xl">What The C?...</div>
 
+	{#if loading}
+		<div class="text-2xl text-slate-500">Loading...</div>
+	{/if}
+
 	{#if saving}
 		<div class="text-3xl text-slate-500">Saving...</div>
 	{/if}
@@ -182,6 +196,7 @@
 			<button
 				aria-label="Save"
 				class="align-middle text-blue-400 disabled:text-slate-500"
+				disabled={saving}
 				onclick={saveGlawski}
 			>
 				<svg
