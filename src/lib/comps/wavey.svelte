@@ -15,6 +15,7 @@
 		};
 
 		label?: string;
+		editor?: boolean;
 	}
 
 	let props: IWaveyProps = $props();
@@ -141,7 +142,7 @@
 		<div class="w-full">
 			{#if props.subslice}
 				<div
-					class="relative h-6 rounded-2xl bg-slate-700"
+					class="relative h-32 rounded-2xl bg-slate-700 my-5"
 					onpointerdown={dragsYaDown}
 					onmousemove={previewSeek}
 					title={previewSeekValue}

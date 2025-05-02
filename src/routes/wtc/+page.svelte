@@ -258,6 +258,7 @@
 				{onTogglePause}
 				{onSeek}
 				subslice={{ start: glawski.start, end: glawski.start + glawski.loopLength }}
+				editor={true}
 			/>
 
 			<div class="mt-5">
