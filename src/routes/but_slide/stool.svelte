@@ -37,6 +37,13 @@
 		return formatTime(props.orca.dieRoll);
 	});
 
+	let ERRRRRY_LASS_ONE: any[] = [];
+
+	Object.keys(TREASURE_TROVE).forEach((key) => {
+		const tracks = TREASURE_TROVE[key];
+		ERRRRRY_LASS_ONE = ERRRRRY_LASS_ONE.concat(tracks);
+	});
+
 	const verifyMaxInstances = (e: any) => {
 		let value = Number(e.currentTarget.value);
 		if (isNaN(value)) {
@@ -91,7 +98,7 @@
 				onchange={(e) => changeTrack(e)}
 				value={props.audioFile}
 			>
-				{#each TREASURE_TROVE.CLICES as track}
+				{#each ERRRRRY_LASS_ONE as track}
 					<option value={track}>{formatTrack(track)}</option>
 				{/each}
 			</select>
@@ -200,12 +207,7 @@
 					<div class="mt-3">
 						<label class="grid grid-cols-2">
 							<span class="mt-2">Delay seconds:</span>
-							<input
-								type="number"
-								max="10"
-								value={props.orca.delay}
-								onchange={verifyDelay}
-							/>
+							<input type="number" max="10" value={props.orca.delay} onchange={verifyDelay} />
 						</label>
 					</div>
 				{/if}
