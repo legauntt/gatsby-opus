@@ -3,7 +3,7 @@
 	import { pushState } from '$app/navigation';
 	import axios from 'axios';
 	import { page } from '$app/state';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { TREASURE_TROVE } from '$lib/cetlist';
 	import Wavey from '$lib/comps/wavey.svelte';
 	import { copyToClippy, formatTrack } from '$lib/utilz';
@@ -38,11 +38,15 @@
 		currentTime: 0
 	});
 
+	let worker: Worker | null = null;
+
 	onMount(async () => {
-		const worker = new Worker('/work_faster.js');
+		worker = new Worker('/work_faster.js');
 		worker.onmessage = (e) => {
 			timerLoop();
 		};
+
+		window.addEventListener('keydown', onKeyDown);
 
 		if (!shareName) {
 			newGlawski();
@@ -63,6 +67,24 @@
 	const onTogglePause = () => {
 		glawski.paused = !glawski.paused;
 	};
+
+	const onKeyDown = (e: KeyboardEvent) => {
+		if (e.code !== 'Space' || !glawski.audioFile) return;
+
+		// Don't hijack the spacebar while typing in the title / value fields.
+		const tag = (e.target as HTMLElement)?.tagName;
+		if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+
+		e.preventDefault();
+		onTogglePause();
+	};
+
+	onDestroy(() => {
+		worker?.terminate();
+		if (typeof window !== 'undefined') {
+			window.removeEventListener('keydown', onKeyDown);
+		}
+	});
 
 	const onSeek = (newValue: number) => {
 		newValue = Number(newValue.toFixed(1));
@@ -252,6 +274,7 @@
 
 		{#if glawski.audioFile}
 			<Wavey
+				src={glawski.audioFile}
 				currentTime={glawski.currentTime}
 				paused={glawski.paused}
 				duration={glawski.duration}
