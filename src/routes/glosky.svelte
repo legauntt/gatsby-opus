@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Wavey from '$lib/comps/wavey.svelte';
+	import { jukebawx } from '$lib/player.svelte';
 	import { formatTrack } from '$lib/utilz';
 
 	interface IGloskyProps {
@@ -78,7 +79,11 @@
 </script>
 
 <div>
-	<div class="mb-3 w-256 border border-solid border-slate-500 p-5">
+	<!-- Gold border while da jukebawx is playing this one -->
+	<div
+		class="mb-3 w-256 border border-solid border-slate-500 p-5"
+		style:border-color={jukebawx.track == props.filename ? 'gold' : ''}
+	>
 		<button onclick={drawpIt}>
 			{formatTrack(props.filename)}
 		</button>
