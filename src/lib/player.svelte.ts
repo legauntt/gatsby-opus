@@ -7,6 +7,13 @@ export const ALBUM_ART: { [key: string]: string } = {
 	CLICES: '/lar/but.webp'
 };
 
+export const ALBUM_TITLES: { [key: string]: string } = {
+	DEMON: 'Demonophonic Blues',
+	BONUS: 'Bonus',
+	SEVEN: 'Seven',
+	CLICES: 'Clices'
+};
+
 const STASH_KEY = 'tct_jukebawx';
 
 /**
@@ -30,12 +37,17 @@ class Jukebawx {
 	track: string = $derived(this.queue[this.index] ?? '');
 
 	playAlbum(album: string) {
-		if (!TREASURE_TROVE[album]) {
+		this.playTrack(album, 0);
+	}
+
+	/** Play one track, with the rest of its album queued behind it. */
+	playTrack(album: string, index: number) {
+		if (!TREASURE_TROVE[album]?.[index]) {
 			return;
 		}
 
 		this.album = album;
-		this.index = 0;
+		this.index = index;
 		this.pendingSeek = null;
 		this.currentTime = 0;
 		this.paused = false;
