@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import Wavey from '$lib/comps/wavey.svelte';
 	import { formatTrack } from '$lib/utilz';
 
@@ -44,16 +45,16 @@
 		}
 	};
 
-	document.addEventListener('play_track', (e) => {
+	const onPlayTrackEvent = (e: Event) => {
 		const message = (e as CustomEvent).detail;
 		// console.log(`Message received:`, message);
 
 		if (message.trackName == props.filename) {
 			drawpIt();
 		}
-	});
+	};
 
-	document.addEventListener('pirates_and_traitors', (e) => {
+	const onPiratesAndTraitors = () => {
 		// console.log(`Message received: ${(e as CustomEvent).detail}`);
 
 		waves.forEach((wave) => {
@@ -63,6 +64,16 @@
 
 		waves = [];
 		activePlays = 0;
+	};
+
+	onMount(() => {
+		document.addEventListener('play_track', onPlayTrackEvent);
+		document.addEventListener('pirates_and_traitors', onPiratesAndTraitors);
+
+		return () => {
+			document.removeEventListener('play_track', onPlayTrackEvent);
+			document.removeEventListener('pirates_and_traitors', onPiratesAndTraitors);
+		};
 	});
 </script>
 
@@ -86,6 +97,7 @@
 				></audio>
 
 				<Wavey
+					src={props.filename}
 					currentTime={wave.currentTime}
 					duration={wave.duration}
 					paused={wave.paused}

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { formatTime } from '$lib/utilz';
+	import { getPeaks } from '$lib/peaks';
 
 	interface IWaveyProps {
 		currentTime: number;
@@ -8,6 +9,10 @@
 
 		onSeek: Function;
 		onTogglePause: Function;
+
+		/** Audio file to render an actual waveform for. Optional: without it
+		 *  (or before it decodes) we fall back to a plain progress bar. */
+		src?: string;
 
 		subslice?: {
 			start: number;
@@ -20,42 +25,44 @@
 
 	let props: IWaveyProps = $props();
 
-	// svelte-ignore non_reactive_update
-	let progressDiv: HTMLDivElement;
-
-	// svelte-ignore non_reactive_update
-	let sliceDiv: HTMLDivElement;
-
 	let previewSeekValue: string = $state('');
+	let peaks: number[] | null = $state(null);
 
 	$effect(() => {
-		const parentWidth = progressDiv.parentElement?.clientWidth;
-		if (!parentWidth) {
-			return;
-		}
+		const src = props.src;
+		peaks = null;
+		if (!src) return;
 
-		if (props.subslice) {
-			const left = (props.subslice.start / props.duration) * 100;
-			const sliceDuration = props.subslice.end - props.subslice.start;
-			const sliceWidth = (sliceDuration / props.duration) * 100;
+		let cancelled = false;
+		getPeaks(src).then((p) => {
+			if (!cancelled) peaks = p;
+		});
 
-			const adjustedStarted = props.currentTime - props.subslice.start;
-			const progressWidth = (adjustedStarted / props.duration) * 100;
-
-			sliceDiv.style.left = left + '%';
-			sliceDiv.style.width = sliceWidth + '%';
-
-			progressDiv.style.left = left + '%';
-			progressDiv.style.width = progressWidth + '%';
-		} else {
-			const percProgress = props.currentTime / props.duration;
-			progressDiv.style.width = percProgress * 100 + '%';
-		}
+		return () => {
+			cancelled = true;
+		};
 	});
+
+	const clamp = (n: number) => Math.max(0, Math.min(1, n));
+
+	let progress = $derived(props.duration ? clamp(props.currentTime / props.duration) : 0);
+
+	let sliceStart = $derived(
+		props.subslice && props.duration ? clamp(props.subslice.start / props.duration) : 0
+	);
+	let sliceEnd = $derived(
+		props.subslice && props.duration ? clamp(props.subslice.end / props.duration) : 1
+	);
+
+	const barState = (i: number, total: number): 'played' | 'slice' | 'rest' => {
+		const ratio = i / total;
+		if (ratio <= progress) return 'played';
+		if (props.subslice && ratio >= sliceStart && ratio <= sliceEnd) return 'slice';
+		return 'rest';
+	};
 
 	const previewSeek = (e: any) => {
 		const div = e.currentTarget;
-
 		const { left, width } = div.getBoundingClientRect();
 
 		let p = (e.clientX - left) / width;
@@ -140,18 +147,45 @@
 		</div>
 
 		<div class="w-full">
-			{#if props.subslice}
+			{#if peaks}
+				<!-- Real waveform: one bar per amplitude bucket -->
 				<div
-					class="relative h-32 rounded-2xl bg-slate-700 my-5"
+					class="flex cursor-pointer items-center gap-px rounded-2xl bg-slate-800 px-2"
+					class:h-32={props.subslice}
+					class:h-16={!props.subslice}
 					onpointerdown={dragsYaDown}
 					onmousemove={previewSeek}
 					title={previewSeekValue}
 					role="tooltip"
 				>
-					<div bind:this={sliceDiv} class="absolute h-[100%] w-0 bg-slate-300"></div>
-					<div bind:this={progressDiv} class="absolute h-[100%] w-0 bg-violet-500"></div>
+					{#each peaks as peak, i}
+						{@const state = barState(i, peaks.length)}
+						<div
+							class="pointer-events-none flex-1 rounded-full"
+							class:bg-violet-500={state === 'played'}
+							class:bg-slate-400={state === 'slice'}
+							class:bg-slate-600={state === 'rest'}
+							style="height: {Math.max(peak * 100, 6)}%"
+						></div>
+					{/each}
+				</div>
+			{:else if props.subslice}
+				<!-- Fallback (pre-decode): slice-aware plain bar -->
+				<div
+					class="relative my-5 h-32 cursor-pointer rounded-2xl bg-slate-700"
+					onpointerdown={dragsYaDown}
+					onmousemove={previewSeek}
+					title={previewSeekValue}
+					role="tooltip"
+				>
+					<div
+						class="absolute h-full bg-slate-500"
+						style="left: {sliceStart * 100}%; width: {(sliceEnd - sliceStart) * 100}%"
+					></div>
+					<div class="absolute h-full bg-violet-500" style="width: {progress * 100}%"></div>
 				</div>
 			{:else}
+				<!-- Fallback (pre-decode): plain bar -->
 				<div
 					class="h-6 cursor-pointer rounded-2xl bg-slate-700"
 					onpointerdown={dragsYaDown}
@@ -159,7 +193,7 @@
 					title={previewSeekValue}
 					role="tooltip"
 				>
-					<div bind:this={progressDiv} class="h-[100%] w-0 bg-violet-500"></div>
+					<div class="h-full bg-violet-500" style="width: {progress * 100}%"></div>
 				</div>
 			{/if}
 		</div>
