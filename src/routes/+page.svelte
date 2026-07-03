@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { TREASURE_TROVE } from '$lib/cetlist';
-	import { tick } from 'svelte';
+	import { ALBUM_ART, jukebawx } from '$lib/player.svelte';
 	import Glosky from './glosky.svelte';
 
 	const KEYS = ['DEMON', 'BONUS', 'SEVEN', 'CLICES'];
@@ -11,33 +11,23 @@
 
 	let activePlaysByTab: any = $state({});
 
-	let playingAlbum = $state('');
-	let playingTrackNum = $state(0);
-
 	KEYS.forEach((key) => {
 		activePlaysByTab[key] = 0;
 	});
 
-	const playAlbum = async (album: string) => {
+	const playAlbum = (album: string) => {
 		sanity();
-		await tick();
-		
-		playingAlbum = album;
-		playingTrackNum = 0;
-		const trackName = TREASURE_TROVE[album][playingTrackNum];
 
-		const event = new CustomEvent('play_track', {
-			detail: {
-				trackName
-			}
-		});
-
-		document.dispatchEvent(event);
+		// Da jukebawx handles the whole album: queueing, auto-advance, lock
+		// screen controls, and it keeps playing wherever you wander.
+		jukebawx.playAlbum(album);
 	};
 
 	const sanity = () => {
 		const event = new CustomEvent('pirates_and_traitors', { detail: 'KTA' });
 		document.dispatchEvent(event);
+
+		jukebawx.stop();
 
 		insanityFactor = 0;
 
@@ -59,41 +49,11 @@
 	const onEndTrack = (tab: string, track: string) => {
 		insanityFactor--;
 		activePlaysByTab[tab]--;
-
-		if (playingAlbum == '') {
-			return;
-		}
-
-		playingTrackNum++;
-		const trackName = TREASURE_TROVE[playingAlbum][playingTrackNum];
-		if (!trackName) {
-			console.log(`Album ended`);
-			playingAlbum = '';
-			playingTrackNum = 0;
-			return;
-		}
-
-		const event = new CustomEvent('play_track', {
-			detail: {
-				trackName
-			}
-		});
-
-		document.dispatchEvent(event);
 	};
 
 	const clickTab = (tabName: string) => {
 		activeTab = tabName;
-
-		if (tabName.includes('BONUS')) {
-			discCoverImage = '/lar/20.png';
-		} else if (tabName.includes('CLICES')) {
-			discCoverImage = '/lar/but.webp';
-		} else if (tabName.includes('SEVEN')) {
-			discCoverImage = '/lar/seven.png';
-		} else {
-			discCoverImage = '/lar/marquee.png';
-		}
+		discCoverImage = ALBUM_ART[tabName] ?? '/lar/marquee.png';
 	};
 </script>
 
@@ -164,6 +124,10 @@
 						{/each}
 					</div>
 				{/each}
+			</div>
+
+			<div class="mt-5">
+				<a href="/wtc" class="text-yellow-500 hover:underline">What The C?...</a>
 			</div>
 		</div>
 	</div>
