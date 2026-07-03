@@ -6,6 +6,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { TREASURE_TROVE } from '$lib/cetlist';
 	import Wavey from '$lib/comps/wavey.svelte';
+	import { jukebawx } from '$lib/player.svelte';
 	import { copyToClippy, formatTrack } from '$lib/utilz';
 	import toast from 'svelte-5-french-toast';
 
@@ -69,20 +70,49 @@
 	};
 
 	const onKeyDown = (e: KeyboardEvent) => {
-		if (e.code !== 'Space' || !glawski.audioFile) return;
+		if (!glawski.audioFile) return;
 
-		// Don't hijack the spacebar while typing in the title / value fields.
+		// Don't hijack keys while typing in the title / value fields.
 		const tag = (e.target as HTMLElement)?.tagName;
 		if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
 
-		e.preventDefault();
-		onTogglePause();
+		if (e.code === 'Space') {
+			e.preventDefault();
+			onTogglePause();
+			return;
+		}
+
+		// Nudge keys: arrows move the loop start by 0.1s, shift+arrows grow
+		// or shrink the loop length. Way less fiddly than dragging.
+		if (e.code === 'ArrowLeft' || e.code === 'ArrowRight') {
+			e.preventDefault();
+			const step = e.code === 'ArrowRight' ? 0.1 : -0.1;
+
+			if (e.shiftKey) {
+				glawski.loopLength = Number(Math.max(glawski.loopLength + step, 0.5).toFixed(1));
+			} else {
+				const maxStart = isNaN(glawski.duration) ? Infinity : glawski.duration - 0.5;
+				glawski.start = Number(
+					Math.min(Math.max(glawski.start + step, 0), maxStart).toFixed(1)
+				);
+				glawski.currentTime = glawski.start;
+			}
+
+			capLoopLength();
+		}
 	};
 
 	onDestroy(() => {
 		worker?.terminate();
 		if (typeof window !== 'undefined') {
 			window.removeEventListener('keydown', onKeyDown);
+		}
+	});
+
+	// Truce: a glawski and da jukebawx yelling over each other helps nobody
+	$effect(() => {
+		if (!glawski.paused && glawski.audioFile) {
+			jukebawx.paused = true;
 		}
 	});
 
