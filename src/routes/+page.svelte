@@ -175,6 +175,6 @@
 	}
 
 	.hidden {
-		visibility: none;
+		display: none;
 	}
 </style>
