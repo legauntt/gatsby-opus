@@ -37,12 +37,7 @@
 		return formatTime(props.orca.dieRoll);
 	});
 
-	let ERRRRRY_LASS_ONE: any[] = [];
-
-	Object.keys(TREASURE_TROVE).forEach((key) => {
-		const tracks = TREASURE_TROVE[key];
-		ERRRRRY_LASS_ONE = ERRRRRY_LASS_ONE.concat(tracks);
-	});
+	const ERRRRRY_LASS_ONE: string[] = Object.values(TREASURE_TROVE).flat();
 
 	const verifyMaxInstances = (e: any) => {
 		let value = Number(e.currentTarget.value);
