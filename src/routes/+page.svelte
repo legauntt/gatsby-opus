@@ -1,144 +1,179 @@
 <script lang="ts">
 	import { TREASURE_TROVE } from '$lib/cetlist';
-	import { ALBUM_ART, jukebawx } from '$lib/player.svelte';
-	import Glosky from './glosky.svelte';
+	import { ALBUM_ART, ALBUM_TITLES, jukebawx } from '$lib/player.svelte';
+	import { trackDuration } from '$lib/durations.svelte';
+	import { formatTime, formatTrack } from '$lib/utilz';
 
 	const KEYS = ['DEMON', 'BONUS', 'SEVEN', 'CLICES'];
 
-	let discCoverImage: string = $state('/lar/marquee.png');
-	let insanityFactor = $state(0);
-	let activeTab = $state('DEMON');
+	let activeAlbum = $state('DEMON');
 
-	let activePlaysByTab: any = $state({});
+	const albumTracks = $derived(TREASURE_TROVE[activeAlbum] ?? []);
+	const albumIsPlaying = $derived(jukebawx.album == activeAlbum && !jukebawx.paused);
 
-	KEYS.forEach((key) => {
-		activePlaysByTab[key] = 0;
-	});
-
-	const playAlbum = (album: string) => {
-		sanity();
-
-		// Da jukebawx handles the whole album: queueing, auto-advance, lock
-		// screen controls, and it keeps playing wherever you wander.
-		jukebawx.playAlbum(album);
+	const clickHeaderPlay = () => {
+		if (jukebawx.album == activeAlbum && jukebawx.track) {
+			jukebawx.togglePause();
+		} else {
+			jukebawx.playAlbum(activeAlbum);
+		}
 	};
 
-	const sanity = () => {
-		const event = new CustomEvent('pirates_and_traitors', { detail: 'KTA' });
-		document.dispatchEvent(event);
-
-		jukebawx.stop();
-
-		insanityFactor = 0;
-
-		KEYS.forEach((key) => {
-			activePlaysByTab[key] = 0;
-		});
-	};
-
-	const onPlayTrack = (tab: string, track: string) => {
-		insanityFactor++;
-		activePlaysByTab[tab]++;
-	};
-
-	const onPauseTrack = (tab: string, track: string) => {
-		insanityFactor--;
-		activePlaysByTab[tab]--;
-	};
-
-	const onEndTrack = (tab: string, track: string) => {
-		insanityFactor--;
-		activePlaysByTab[tab]--;
-	};
-
-	const clickTab = (tabName: string) => {
-		activeTab = tabName;
-		discCoverImage = ALBUM_ART[tabName] ?? '/lar/marquee.png';
+	const clickTrack = (index: number) => {
+		if (jukebawx.track == albumTracks[index]) {
+			jukebawx.togglePause();
+		} else {
+			jukebawx.playTrack(activeAlbum, index);
+		}
 	};
 </script>
 
-<div class="p-5">
-	<div class="block xl:flex">
-		<div>
-			<img src={discCoverImage} alt="Pitchaw on da 20" class="w-[1200px] object-contain lg:h-256" />
-		</div>
+<div class="p-5 lg:flex lg:gap-10">
+	<!-- Cover art + album picker -->
+	<div class="mx-auto w-full max-w-xl shrink-0 lg:mx-0 lg:w-[480px]">
+		<img
+			src={ALBUM_ART[activeAlbum]}
+			alt={ALBUM_TITLES[activeAlbum] ?? activeAlbum}
+			class="aspect-square w-full rounded-lg object-cover shadow-2xl"
+		/>
 
-		<div>
-			<div>
-				{#each KEYS as tab}
-					<button
-						class="bg-slate-500 p-2 align-middle"
-						class:mr-3={activeTab != tab}
-						class:active={activeTab == tab}
-						onclick={() => clickTab(tab)}
-					>
-						{tab}
-						{#if activePlaysByTab[tab] > 0}
-							({activePlaysByTab[tab]})
-						{/if}
-					</button>
+		<div class="mt-4 flex gap-3">
+			{#each KEYS as key}
+				<button
+					aria-label={`Album ${key}`}
+					title={ALBUM_TITLES[key] ?? key}
+					onclick={() => (activeAlbum = key)}
+					class="relative aspect-square w-20 overflow-hidden rounded transition-opacity"
+					class:ring-2={activeAlbum == key}
+					class:ring-yellow-400={activeAlbum == key}
+					class:opacity-50={activeAlbum != key}
+					class:hover:opacity-100={activeAlbum != key}
+				>
+					<img src={ALBUM_ART[key]} alt={ALBUM_TITLES[key] ?? key} class="h-full w-full object-cover" />
 
-					{#if activeTab == tab}
-						<button
-							aria-label="Play album"
-							title="Play album"
-							onclick={() => playAlbum(tab)}
-							class="mr-3 border border-solid border-blue-400 bg-blue-500 p-2 align-middle text-white"
+					{#if jukebawx.album == key && jukebawx.track}
+						<span
+							class="absolute right-1 bottom-1 rounded-full bg-black/70 px-1.5 text-xs text-yellow-400"
+							title="Now playing"
 						>
+							♪
+						</span>
+					{/if}
+				</button>
+			{/each}
+		</div>
+	</div>
+
+	<!-- Track list -->
+	<div class="mt-8 w-full max-w-2xl lg:mt-0">
+		<div class="text-xs tracking-[0.3em] text-slate-400">ALBUM</div>
+		<h1 class="mt-1 text-4xl font-bold uppercase">{ALBUM_TITLES[activeAlbum] ?? activeAlbum}</h1>
+		<div class="mt-1 text-slate-400">{albumTracks.length} tracks</div>
+
+		<button
+			onclick={clickHeaderPlay}
+			class="mt-5 inline-flex items-center gap-2 rounded-full bg-yellow-500 px-6 py-2 font-bold text-black hover:bg-yellow-400"
+		>
+			{#if albumIsPlaying}
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
+					<path
+						d="M5.75 3a.75.75 0 0 0-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 0 0 .75-.75V3.75A.75.75 0 0 0 7.25 3h-1.5ZM12.75 3a.75.75 0 0 0-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 0 0 .75-.75V3.75a.75.75 0 0 0-.75-.75h-1.5Z"
+					/>
+				</svg>
+				PAUSE
+			{:else}
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
+					<path
+						d="M6.3 2.84A1.5 1.5 0 0 0 4 4.11v11.78a1.5 1.5 0 0 0 2.3 1.27l9.344-5.891a1.5 1.5 0 0 0 0-2.538L6.3 2.841Z"
+					/>
+				</svg>
+				PLAY
+			{/if}
+		</button>
+
+		<div class="mt-6 divide-y divide-slate-800 border-t border-b border-slate-800">
+			{#each albumTracks as filename, i}
+				{@const current = jukebawx.track == filename}
+				<button
+					onclick={() => clickTrack(i)}
+					class="group flex w-full items-center gap-4 px-3 py-3 text-left hover:bg-slate-800/60"
+					class:text-yellow-400={current}
+				>
+					<span class="flex w-8 shrink-0 items-center justify-end">
+						{#if current && !jukebawx.paused}
+							<!-- Playing: lil equalizer, pause on hover -->
+							<span class="eq inline-flex h-4 items-end gap-[2px] group-hover:hidden" aria-hidden="true">
+								<i></i><i></i><i></i>
+							</span>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke-width="1.5"
-								stroke="currentColor"
-								class="size-6"
+								viewBox="0 0 20 20"
+								fill="currentColor"
+								class="hidden size-4 group-hover:inline"
 							>
 								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"
+									d="M5.75 3a.75.75 0 0 0-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 0 0 .75-.75V3.75A.75.75 0 0 0 7.25 3h-1.5ZM12.75 3a.75.75 0 0 0-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 0 0 .75-.75V3.75a.75.75 0 0 0-.75-.75h-1.5Z"
 								/>
 							</svg>
-						</button>
-					{/if}
-				{/each}
+						{:else if current}
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-4">
+								<path
+									d="M6.3 2.84A1.5 1.5 0 0 0 4 4.11v11.78a1.5 1.5 0 0 0 2.3 1.27l9.344-5.891a1.5 1.5 0 0 0 0-2.538L6.3 2.841Z"
+								/>
+							</svg>
+						{:else}
+							<span class="text-slate-500 tabular-nums group-hover:hidden">{i + 1}</span>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 20 20"
+								fill="currentColor"
+								class="hidden size-4 text-slate-300 group-hover:inline"
+							>
+								<path
+									d="M6.3 2.84A1.5 1.5 0 0 0 4 4.11v11.78a1.5 1.5 0 0 0 2.3 1.27l9.344-5.891a1.5 1.5 0 0 0 0-2.538L6.3 2.841Z"
+								/>
+							</svg>
+						{/if}
+					</span>
 
-				{#if insanityFactor > 2}
-					<button onclick={sanity} class="ml-3 bg-violet-500 p-2 text-white"
-						>Make It Stop ({insanityFactor})</button
-					>
-				{/if}
-			</div>
+					<span class="grow truncate">{formatTrack(filename)}</span>
 
-			<div class="mt-5">
-				{#each KEYS as key}
-					<!-- Each album-->
-					<div class:hidden={activeTab != key}>
-						{#each TREASURE_TROVE[key] as filename}
-							<Glosky
-								{filename}
-								onPlayTrack={(track: string) => onPlayTrack(key, track)}
-								onPauseTrack={(track: string) => onPauseTrack(key, track)}
-								onEndTrack={(track: string) => onEndTrack(key, track)}
-							/>
-						{/each}
-					</div>
-				{/each}
-			</div>
+					<span class="shrink-0 text-sm text-slate-500 tabular-nums">
+						{formatTime(trackDuration(filename) ?? NaN)}
+					</span>
+				</button>
+			{/each}
+		</div>
 
-			<div class="mt-5">
-				<a href="/wtc" class="text-yellow-500 hover:underline">What The C?...</a>
-			</div>
+		<div class="mt-8">
+			<a href="/wtc" class="text-yellow-500 hover:underline">What The C?...</a>
 		</div>
 	</div>
 </div>
 
 <style scoped>
-	.active {
-		background: orangered;
+	.eq i {
+		display: block;
+		width: 3px;
+		background: currentColor;
+		animation: eq-bounce 0.8s ease-in-out infinite;
 	}
 
-	.hidden {
-		display: none;
+	.eq i:nth-child(2) {
+		animation-delay: 0.25s;
+	}
+
+	.eq i:nth-child(3) {
+		animation-delay: 0.5s;
+	}
+
+	@keyframes eq-bounce {
+		0%,
+		100% {
+			height: 30%;
+		}
+		50% {
+			height: 100%;
+		}
 	}
 </style>
