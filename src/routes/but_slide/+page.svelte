@@ -5,11 +5,13 @@
 	import { page } from '$app/state';
 	import dayjs from 'dayjs';
 	import Stool from './stool.svelte';
+	import Meadow from './meadow.svelte';
 	import { nanoid } from 'nanoid';
 	import { random } from 'lodash';
-	import { onMount, tick } from 'svelte';
+	import { onMount, onDestroy, tick } from 'svelte';
 	import axios from 'axios';
 	import toast from 'svelte-5-french-toast';
+	import { jukebawx } from '$lib/player.svelte';
 	import { copyToClippy } from '$lib/utilz';
 
 	// @ts-ignore - added by vite
@@ -55,8 +57,11 @@
 	let gameLoopStartTime = $state(0);
 	let loading = $state(false);
 
+	let worker: Worker | null = null;
+	let preloadTimeout: ReturnType<typeof setTimeout> | null = null;
+
 	onMount(async () => {
-		const worker = new Worker('/workWork.js');
+		worker = new Worker('/workWork.js');
 		worker.onmessage = (e) => {
 			gameLoop();
 		};
@@ -79,8 +84,45 @@
 		}
 	});
 
+	onDestroy(() => {
+		// The garden must not keep spawning sounds after we leave: detached
+		// Audio elements and the worker tick both outlive the component.
+		endInsanity();
+		worker?.terminate();
+
+		if (preloadTimeout) {
+			clearTimeout(preloadTimeout);
+		}
+	});
+
 	const formatTrack = (track: string) => {
 		return track.split('/').slice(-1)[0];
+	};
+
+	/**
+	 * All roads to a spawned sound go through here: honors the clice's
+	 * volume/mute from the editor, tracks the ref so endInsanity can kill
+	 * it, and tells da meadow to fwoosh.
+	 */
+	const spawnAudio = (clice: IClice, onEnded?: () => void) => {
+		const audioElm = new Audio(clice.audioFile);
+		audioElm.loop = clice.loop;
+		audioElm.volume = clice.volume;
+		audioElm.muted = clice.muted;
+		audioElm.play();
+
+		if (onEnded) {
+			audioElm.addEventListener('ended', onEnded);
+		}
+
+		gameRefs.push({
+			clice,
+			audio: audioElm
+		});
+
+		document.dispatchEvent(new CustomEvent('butterfly_fwoosh'));
+
+		return audioElm;
 	};
 
 	const addClice = () => {
@@ -147,6 +189,9 @@
 		editorState = 'playing';
 		logIt('Started the insanity...');
 
+		// The garden is its own soundscape -- hush da jukebawx
+		jukebawx.paused = true;
+
 		clices.forEach((entry) => {
 			trackCounts[entry.id] = 0;
 			entry.played = false;
@@ -159,6 +204,20 @@
 
 		logIt(`Preloading distinct tracks...`);
 		let activelyLoading = 0;
+		let rolling = false;
+
+		const checkIfLoaded = () => {
+			if (activelyLoading <= 0 && !rolling) {
+				rolling = true;
+
+				if (preloadTimeout) {
+					clearTimeout(preloadTimeout);
+					preloadTimeout = null;
+				}
+
+				movingOnOverToTheBreakdownLane();
+			}
+		};
 
 		Object.keys(distinctTracks).forEach((audioFile) => {
 			logIt(`Preloading track ${audioFile}`);
@@ -169,13 +228,23 @@
 				activelyLoading--;
 				checkIfLoaded();
 			});
+
+			// A track that errors must not hang the whole garden
+			temp.addEventListener('error', () => {
+				logIt(`Failed to preload ${audioFile}, moving on`);
+				activelyLoading--;
+				checkIfLoaded();
+			});
 		});
 
-		const checkIfLoaded = () => {
-			if (activelyLoading <= 0) {
-				movingOnOverToTheBreakdownLane();
+		// Belt and suspenders: if canplaythrough never comes, go anyway
+		preloadTimeout = setTimeout(() => {
+			if (!rolling) {
+				logIt('Preload is dragging its feet, starting anyway...');
+				activelyLoading = 0;
+				checkIfLoaded();
 			}
-		};
+		}, 10000);
 
 		const movingOnOverToTheBreakdownLane = () => {
 			const loaders = clices.filter((entry) => entry.orca.startType == 'onload');
@@ -183,17 +252,8 @@
 			logIt(`Processing loaders...`);
 			loaders.forEach((loader) => {
 				logIt(`Playing ${loader.audioFile} ${loader.id} (onload), loop=${loader.loop}`);
-				const audioElm = new Audio(loader.audioFile);
-				audioElm.loop = loader.loop;
-				audioElm.play();
-
-				audioElm.addEventListener('ended', () => {
+				spawnAudio(loader, () => {
 					logIt(`Track ended: ${loader.audioFile} ${loader.id}`);
-				});
-
-				gameRefs.push({
-					clice: loader,
-					audio: audioElm
 				});
 			});
 
@@ -216,22 +276,8 @@
 				if (diff >= spawner.orca.delay) {
 					spawner.played = true;
 
-					const audioElm = new Audio(spawner.audioFile);
-
 					logIt(`Spawning ${spawner.audioFile} ${spawner.id} from delay`);
-
-					// probably shouldn't allow the loop
-					audioElm.loop = spawner.loop;
-					audioElm.play();
-
-					gameRefs.push({
-						clice: spawner,
-						audio: audioElm
-					});
-
-					audioElm.addEventListener('ended', () => {
-						// ...
-					});
+					spawnAudio(spawner);
 				}
 			}
 
@@ -241,23 +287,13 @@
 
 			const dieRoll = random(1, spawner.orca.dieRoll);
 			if (dieRoll == spawner.orca.dieRoll) {
-				const audioElm = new Audio(spawner.audioFile);
 				trackCounts[spawner.id]++;
 
 				logIt(
 					`Spawning ${spawner.audioFile} ${spawner.id} from dieRoll=${dieRoll}, instances=${trackCounts[spawner.id]}`
 				);
 
-				// probably shouldn't allow the loop
-				audioElm.loop = spawner.loop;
-				audioElm.play();
-
-				gameRefs.push({
-					clice: spawner,
-					audio: audioElm
-				});
-
-				audioElm.addEventListener('ended', () => {
+				spawnAudio(spawner, () => {
 					trackCounts[spawner.id]--;
 				});
 			}
@@ -273,6 +309,9 @@
 		gameRefs.forEach((ref) => {
 			ref.audio.pause();
 		});
+
+		// Don't hoard dead refs across rounds
+		gameRefs = [];
 	};
 
 	const logIt = async (mess: string) => {
@@ -305,6 +344,8 @@
 	/>
 
 	{#if editorState != 'editing'}
+		<Meadow />
+
 		{#if fullScreen}
 			<div class="absolute top-5 left-5 text-2xl text-black">
 				<button class="bg-slate-300 p-2" onclick={() => (fullScreen = false)}> Show logs </button>
@@ -422,8 +463,16 @@
 
 			<a href="/" class="mt-5 ml-3 text-yellow-200 hover:underline">Denny, let's go hoooome.</a>
 		{:else}
+			<!-- Controls above the logs: the bottom of the viewport belongs to
+			     da jukebawx bar, and stopping shouldn't require scrolling anyway -->
+			<div class="my-3">
+				<button class="bg-amber-950 p-2" onclick={endInsanity}>Stop the insanity</button>
+
+				<a href="/" class="ml-3 text-yellow-500 hover:underline">Denny, let's go hoooome.</a>
+			</div>
+
 			<div
-				class="h-[75vh] overflow-y-scroll bg-slate-500 p-2 text-black 2xl:h-[90vh]"
+				class="h-[65vh] overflow-y-scroll bg-slate-500 p-2 text-black 2xl:h-[80vh]"
 				bind:this={logsDiv}
 			>
 				{#each logs as log}
@@ -431,11 +480,6 @@
 						{log}
 					</div>
 				{/each}
-			</div>
-			<div class="mt-5">
-				<button class="bg-amber-950 p-2" onclick={endInsanity}>Stop the insanity</button>
-
-				<a href="/" class="ml-3 text-yellow-500 hover:underline">Denny, let's go hoooome.</a>
 			</div>
 		{/if}
 
