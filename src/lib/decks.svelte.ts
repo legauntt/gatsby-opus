@@ -71,6 +71,9 @@ class Decks {
 	position: number = $state(0);
 	totalDuration: number = $state(0);
 
+	/** Whole-mix repeat, like the classic single-slice glawski looped forever. */
+	loopMix: boolean = $state(true);
+
 	/** Which track the loop preview belongs to (so UIs can match playheads). */
 	loopSrc: string = $state('');
 
@@ -84,6 +87,12 @@ class Decks {
 	private mixNodes: AudioBufferSourceNode[] = [];
 	private t0 = 0;
 	private startedAt = 0;
+
+	/** Mix-time (seconds since t0's position) we've scheduled sources up to. */
+	private scheduledV = 0;
+
+	/** Interval that keeps looping passes queued -- rAF freezes in hidden tabs. */
+	private schedTimer = 0;
 
 	private raf = 0;
 	private gen = 0;
@@ -115,6 +124,11 @@ class Decks {
 			}
 			this.loopNode.disconnect();
 			this.loopNode = null;
+		}
+
+		if (this.schedTimer) {
+			clearInterval(this.schedTimer);
+			this.schedTimer = 0;
 		}
 
 		if (this.raf) {
@@ -260,32 +274,100 @@ class Decks {
 		this.scheduleFrom(Math.max(0, Math.min(from, total)));
 	}
 
+	private startMixNode(
+		ctx: AudioContext,
+		when: number,
+		src: string,
+		offset: number,
+		duration: number
+	) {
+		const buffer = this.buffers.get(src);
+		if (!buffer) return;
+
+		const node = ctx.createBufferSource();
+		node.buffer = buffer;
+		node.connect(ctx.destination);
+		node.start(when, offset, duration);
+
+		// Looping schedules passes forever; finished nodes must not pile up.
+		node.onended = () => {
+			const i = this.mixNodes.indexOf(node);
+			if (i >= 0) this.mixNodes.splice(i, 1);
+			node.disconnect();
+		};
+
+		this.mixNodes.push(node);
+	}
+
+	/** Queue one more full pass of the mix right behind whatever's scheduled. */
+	private schedulePass(ctx: AudioContext) {
+		for (const seg of this.segments) {
+			this.startMixNode(
+				ctx,
+				this.t0 + this.scheduledV + seg.when,
+				seg.src,
+				seg.offset,
+				seg.duration
+			);
+		}
+		this.scheduledV += this.totalDuration;
+	}
+
+	/**
+	 * Keep a generous window of passes queued ahead of the audio clock. Driven
+	 * by both the rAF tick and a 1s interval: rAF freezes in hidden tabs, and
+	 * background playback (the whole point of looping forever) must not starve.
+	 */
+	private topUp(ctx: AudioContext) {
+		if (!this.playing || !this.loopMix || this.totalDuration <= 0) return;
+
+		const elapsed = ctx.currentTime - this.t0;
+
+		// Safety net for deep throttling: skip wholly-elapsed passes instead of
+		// start()ing them in the past, which would stack every missed pass into
+		// one simultaneous burst.
+		if (this.scheduledV < elapsed) {
+			const missed = Math.ceil((elapsed - this.scheduledV) / this.totalDuration);
+			this.scheduledV += missed * this.totalDuration;
+		}
+
+		const lookahead = Math.max(this.totalDuration, 30);
+		while (this.scheduledV - elapsed < lookahead) {
+			this.schedulePass(ctx);
+		}
+	}
+
 	private scheduleFrom(pos: number) {
 		const ctx = this.ensureCtx();
 		if (!ctx) return;
 
 		// A hair of headroom so the first segment isn't scheduled in the past.
 		const t0 = ctx.currentTime + 0.06;
+		this.t0 = t0;
 
 		for (const seg of this.segments) {
 			if (seg.when + seg.duration <= pos) continue;
 
-			const buffer = this.buffers.get(seg.src);
-			if (!buffer) continue;
-
 			const skip = Math.max(0, pos - seg.when);
-
-			const node = ctx.createBufferSource();
-			node.buffer = buffer;
-			node.connect(ctx.destination);
-			node.start(t0 + Math.max(0, seg.when - pos), seg.offset + skip, seg.duration - skip);
-			this.mixNodes.push(node);
+			this.startMixNode(
+				ctx,
+				t0 + Math.max(0, seg.when - pos),
+				seg.src,
+				seg.offset + skip,
+				seg.duration - skip
+			);
 		}
 
-		this.t0 = t0;
+		this.scheduledV = this.totalDuration - pos;
 		this.startedAt = pos;
 		this.position = pos;
 		this.playing = true;
+
+		if (this.loopMix) {
+			this.topUp(ctx);
+			this.schedTimer = window.setInterval(() => this.topUp(ctx), 1000);
+		}
+
 		this.tickMix(ctx);
 	}
 
@@ -295,20 +377,37 @@ class Decks {
 		const step = () => {
 			if (gen !== this.gen || !this.playing) return;
 
-			const pos = this.startedAt + (ctx.currentTime - this.t0);
+			const elapsed = ctx.currentTime - this.t0;
+			const pos = this.startedAt + elapsed;
 
-			if (pos >= this.totalDuration) {
+			if (this.loopMix) {
+				this.topUp(ctx);
+				this.position = Math.max(0, pos % this.totalDuration);
+			} else if (pos >= this.totalDuration) {
 				// Ran off the end: park at zero, ready to go again.
 				this.silence();
 				this.position = 0;
 				return;
+			} else {
+				this.position = Math.max(0, pos);
 			}
 
-			this.position = Math.max(0, pos);
 			this.raf = requestAnimationFrame(step);
 		};
 
 		this.raf = requestAnimationFrame(step);
+	}
+
+	/** Flip whole-mix looping; a playing mix is re-scheduled in place. */
+	toggleLoopMix() {
+		this.loopMix = !this.loopMix;
+
+		if (this.mode === 'mix' && this.playing) {
+			const pos = this.position;
+			this.gen++;
+			this.silence();
+			this.scheduleFrom(pos);
+		}
 	}
 
 	seekMix(to: number) {
@@ -334,7 +433,11 @@ class Decks {
 
 		if (this.mode === 'mix' && ctx) {
 			// Freeze the playhead off the audio clock before killing the nodes.
-			this.position = Math.min(this.startedAt + (ctx.currentTime - this.t0), this.totalDuration);
+			const pos = this.startedAt + (ctx.currentTime - this.t0);
+			this.position =
+				this.loopMix && this.totalDuration > 0
+					? pos % this.totalDuration
+					: Math.min(pos, this.totalDuration);
 		}
 
 		this.gen++;
