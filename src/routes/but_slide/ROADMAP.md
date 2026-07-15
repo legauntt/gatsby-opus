@@ -33,7 +33,7 @@ plays. The architecture decisions that matter later:
   tiled or extended background.
 - Butterfly density varies by region (quiet corners, busy blooms) so
   walking feels like discovering.
-- Sounds get world positions: clices spawn *somewhere*, stereo pan +
+- Sounds get world positions: clices spawn _somewhere_, stereo pan +
   volume by distance from the camera (Web Audio `PannerNode`). Walk
   toward a sound to find it.
 

@@ -110,7 +110,9 @@
 </script>
 
 {#if jukebawx.track}
-	<div class="fixed inset-x-0 bottom-0 z-40 border-t border-solid border-slate-600 bg-slate-800 px-4 pb-2">
+	<div
+		class="fixed inset-x-0 bottom-0 z-40 border-t border-solid border-slate-600 bg-slate-800 px-4 pb-2"
+	>
 		<audio
 			bind:this={audioEl}
 			src={jukebawx.track}
