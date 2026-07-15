@@ -14,7 +14,6 @@
 	import { jukebawx } from '$lib/player.svelte';
 	import { copyToClippy } from '$lib/utilz';
 
-	// @ts-ignore - added by vite
 	const buildTime = dayjs(__BUILD_TIME__).format('YYYY-MM-DD HH:mm:ss');
 
 	const shareName = page.url.searchParams.get('s') || '';
@@ -43,8 +42,8 @@
 	let clices: IClice[] = $state([]);
 	let logs: string[] = $state([]);
 
-	let gameRefs: any[] = $state([]);
-	let trackCounts: any = $state({});
+	let gameRefs: { clice: IClice; audio: HTMLAudioElement }[] = $state([]);
+	let trackCounts: { [id: string]: number } = $state({});
 
 	// svelte-ignore non_reactive_update
 	let logsDiv: HTMLDivElement;
@@ -62,7 +61,7 @@
 
 	onMount(async () => {
 		worker = new Worker('/workWork.js');
-		worker.onmessage = (e) => {
+		worker.onmessage = () => {
 			gameLoop();
 		};
 
@@ -73,7 +72,7 @@
 				loading = false;
 				const preset = response.data.preset || {};
 				title = preset.title;
-				clices = preset.clices.map((entry: any) => {
+				clices = preset.clices.map((entry: IClice) => {
 					entry.currentTime = 0;
 					entry.paused = true;
 					return entry;
@@ -197,7 +196,7 @@
 			entry.played = false;
 		});
 
-		const distinctTracks = clices.reduce((acc: any, entry) => {
+		const distinctTracks = clices.reduce((acc: { [audioFile: string]: boolean }, entry) => {
 			acc[entry.audioFile] = true;
 			return acc;
 		}, {});
@@ -432,7 +431,7 @@
 			{/if}
 
 			<div class="mt-5">
-				{#each clices as entry}
+				{#each clices as entry (entry.id)}
 					<audio
 						src={entry.audioFile}
 						bind:duration={entry.duration}
@@ -475,7 +474,7 @@
 				class="h-[65vh] overflow-y-scroll bg-slate-500 p-2 text-black 2xl:h-[80vh]"
 				bind:this={logsDiv}
 			>
-				{#each logs as log}
+				{#each logs as log, i (i)}
 					<div>
 						{log}
 					</div>

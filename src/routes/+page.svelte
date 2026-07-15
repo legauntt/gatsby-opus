@@ -38,7 +38,7 @@
 		/>
 
 		<div class="mt-4 flex gap-3">
-			{#each KEYS as key}
+			{#each KEYS as key (key)}
 				<button
 					aria-label={`Album ${key}`}
 					title={ALBUM_TITLES[key] ?? key}
@@ -49,7 +49,11 @@
 					class:opacity-50={activeAlbum != key}
 					class:hover:opacity-100={activeAlbum != key}
 				>
-					<img src={ALBUM_ART[key]} alt={ALBUM_TITLES[key] ?? key} class="h-full w-full object-cover" />
+					<img
+						src={ALBUM_ART[key]}
+						alt={ALBUM_TITLES[key] ?? key}
+						class="h-full w-full object-cover"
+					/>
 
 					{#if jukebawx.album == key && jukebawx.track}
 						<span
@@ -75,14 +79,24 @@
 			class="mt-5 inline-flex items-center gap-2 rounded-full bg-yellow-500 px-6 py-2 font-bold text-black hover:bg-yellow-400"
 		>
 			{#if albumIsPlaying}
-				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					viewBox="0 0 20 20"
+					fill="currentColor"
+					class="size-5"
+				>
 					<path
 						d="M5.75 3a.75.75 0 0 0-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 0 0 .75-.75V3.75A.75.75 0 0 0 7.25 3h-1.5ZM12.75 3a.75.75 0 0 0-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 0 0 .75-.75V3.75a.75.75 0 0 0-.75-.75h-1.5Z"
 					/>
 				</svg>
 				PAUSE
 			{:else}
-				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					viewBox="0 0 20 20"
+					fill="currentColor"
+					class="size-5"
+				>
 					<path
 						d="M6.3 2.84A1.5 1.5 0 0 0 4 4.11v11.78a1.5 1.5 0 0 0 2.3 1.27l9.344-5.891a1.5 1.5 0 0 0 0-2.538L6.3 2.841Z"
 					/>
@@ -92,7 +106,7 @@
 		</button>
 
 		<div class="mt-6 divide-y divide-slate-800 border-t border-b border-slate-800">
-			{#each albumTracks as filename, i}
+			{#each albumTracks as filename, i (filename)}
 				{@const current = jukebawx.track == filename}
 				<button
 					onclick={() => clickTrack(i)}
@@ -102,7 +116,10 @@
 					<span class="flex w-8 shrink-0 items-center justify-end">
 						{#if current && !jukebawx.paused}
 							<!-- Playing: lil equalizer, pause on hover -->
-							<span class="eq inline-flex h-4 items-end gap-[2px] group-hover:hidden" aria-hidden="true">
+							<span
+								class="eq inline-flex h-4 items-end gap-[2px] group-hover:hidden"
+								aria-hidden="true"
+							>
 								<i></i><i></i><i></i>
 							</span>
 							<svg
@@ -116,7 +133,12 @@
 								/>
 							</svg>
 						{:else if current}
-							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-4">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 20 20"
+								fill="currentColor"
+								class="size-4"
+							>
 								<path
 									d="M6.3 2.84A1.5 1.5 0 0 0 4 4.11v11.78a1.5 1.5 0 0 0 2.3 1.27l9.344-5.891a1.5 1.5 0 0 0 0-2.538L6.3 2.841Z"
 								/>
