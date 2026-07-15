@@ -17,6 +17,7 @@
 	const DEF_LOOP_LEN = 5;
 	const MIN_LEN = 0.1;
 	const STASH_KEY = 'tct_wtc_wip';
+	const LEARNED_KEY = 'tct_wtc_learned';
 
 	const allTracks = TREASURE_TROVE.DEMON.concat(
 		TREASURE_TROVE.BONUS,
@@ -51,6 +52,16 @@
 	let mix: MixSlice[] = $state([]);
 	let editingId: string | null = $state(null);
 	let trackDur = $state(NaN);
+	let showHelp = $state(false);
+
+	const dismissHelp = () => {
+		showHelp = false;
+		try {
+			localStorage.setItem(LEARNED_KEY, 'yeh');
+		} catch {
+			// they'll just meet the tutorial again -- survivable
+		}
+	};
 
 	/** Whatever's on the editor right now: a mix step being tweaked, or the scratch slice. */
 	const active = $derived(mix.find((s) => s.id === editingId) ?? scratch);
@@ -84,6 +95,12 @@
 
 	onMount(async () => {
 		window.addEventListener('keydown', onKeyDown);
+
+		try {
+			showHelp = !localStorage.getItem(LEARNED_KEY);
+		} catch {
+			// no storage, no first-visit detection -- leave it closed
+		}
 
 		if (!shareName) {
 			unstash();
@@ -260,6 +277,17 @@
 
 	const isLoopingActive = $derived(decks.mode === 'loop' && decks.loopSrc === active.audioFile);
 	const sliceyPos = $derived(isLoopingActive ? decks.position : null);
+
+	// Space follows the mix once mix mode is active (see onKeyDown), so only
+	// advertise the shortcut on the button it will actually hit.
+	const loopBtnTitle = $derived(
+		(isLoopingActive && decks.playing ? 'Pause da loop' : 'Loop da slice on repeat') +
+			(decks.mode === 'mix' ? '' : ' (space)')
+	);
+	const mixBtnTitle = $derived(
+		(decks.mode === 'mix' && decks.playing ? 'Pause da mix' : 'Play da whole mix') +
+			(decks.mode === 'mix' ? ' (space)' : '')
+	);
 
 	const toggleLoopPlay = () => {
 		if (!active.audioFile) return;
@@ -585,7 +613,82 @@
 </svelte:head>
 
 <div class="p-5">
-	<div class="text-3xl">What The C?...</div>
+	<div class="flex items-center gap-3">
+		<div class="text-3xl">What The C?...</div>
+		<button
+			aria-label="How dis works"
+			title="How dis works"
+			class="flex size-7 items-center justify-center rounded-full border border-solid border-slate-500 text-slate-400 hover:border-slate-300 hover:text-white"
+			onclick={() => (showHelp ? dismissHelp() : (showHelp = true))}
+		>
+			?
+		</button>
+	</div>
+
+	<div class="mt-1 text-sm text-slate-400">
+		Slice up da tracks, loop da slices, stack 'em into a mix.
+	</div>
+
+	{#if showHelp}
+		<div
+			class="mt-4 max-w-3xl rounded-xl border border-solid border-violet-500/50 bg-slate-900 p-4"
+		>
+			<div class="flex items-center justify-between">
+				<div class="text-xs tracking-[0.3em] text-violet-300">HOW DIS WORKS</div>
+				<button
+					aria-label="Close tutorial"
+					class="text-slate-400 hover:text-white"
+					onclick={dismissHelp}
+				>
+					{@render icon('M6 18 18 6M6 6l12 12', 'size-5')}
+				</button>
+			</div>
+
+			<ol class="mt-3 list-decimal space-y-2 pl-5 text-slate-300">
+				<li>
+					<span class="font-bold text-white">Pick a track</span> from the dropdown below.
+				</li>
+				<li>
+					<span class="font-bold text-white">Carve a slice.</span> On the FULL TRACK wave: drag the yellow
+					edges to resize, drag the middle to move it, or drag across empty space to draw a fresh one.
+					The CLOSE-UP strip is the same slice zoomed in, for fine-tuning the edges.
+				</li>
+				<li>
+					<span class="font-bold text-white">Loop it.</span> The play button loops your slice over and
+					over while you keep tweaking &mdash; that's how you dial it in. The Start / Length boxes take
+					exact seconds.
+				</li>
+				<li>
+					<span class="font-bold text-white">Stack da mix.</span> "+ Add to da mix" drops the slice in
+					as a step. &times;N is how many times that step repeats. Use the pencil to re-edit a step (it
+					opens back up top), the arrows to reorder, the pages to duplicate.
+				</li>
+				<li>
+					<span class="font-bold text-white">Ship it.</span> Play da mix (it loops until you hit stop),
+					bounce it to a WAV file, or hit the save icon to get a share link.
+				</li>
+			</ol>
+
+			<div class="mt-3 text-sm text-slate-400">
+				Keys:
+				<span class="rounded border border-solid border-slate-600 px-1">space</span> play/pause
+				&middot;
+				<span class="rounded border border-solid border-slate-600 px-1">&larr;</span>
+				<span class="rounded border border-solid border-slate-600 px-1">&rarr;</span> nudge start
+				&middot;
+				<span class="rounded border border-solid border-slate-600 px-1">shift</span>+arrows resize
+				&middot; hold
+				<span class="rounded border border-solid border-slate-600 px-1">alt</span> for 0.01s steps
+			</div>
+
+			<button
+				class="mt-4 rounded-full bg-violet-600 px-4 py-1 font-bold hover:bg-violet-500"
+				onclick={dismissHelp}
+			>
+				Got it
+			</button>
+		</div>
+	{/if}
 
 	{#if loading}
 		<div class="text-2xl text-slate-500">Loading...</div>
@@ -597,27 +700,38 @@
 
 	<div class="mt-5">
 		<div class="xl:inline-block">
-			<select
-				class="border border-solid border-slate-500 bg-black p-2 align-middle"
-				value={active.audioFile}
-				onchange={onTrackChange}
-			>
-				<option value="" disabled>Pick a trizzack...</option>
-				{#each allTracks as track (track)}
-					<option value={track}>{formatTrack(track)}</option>
-				{/each}
-			</select>
+			<label>
+				<span class="mr-1 text-slate-400">Track</span>
+				<select
+					class="border border-solid border-slate-500 bg-black p-2 align-middle"
+					value={active.audioFile}
+					onchange={onTrackChange}
+				>
+					<option value="" disabled>Pick a trizzack...</option>
+					{#each allTracks as track (track)}
+						<option value={track}>{formatTrack(track)}</option>
+					{/each}
+				</select>
+			</label>
 		</div>
 
 		<div class="xl:inline-block">
-			<input
-				type="text"
-				class="border border-solid border-slate-500 p-2 align-middle xl:ml-3 xl:min-w-128"
-				bind:value={title}
-				placeholder="Yeh I remembaw..."
-			/>
+			<label>
+				<span class="mr-1 text-slate-400 xl:ml-3">Title</span>
+				<input
+					type="text"
+					class="border border-solid border-slate-500 p-2 align-middle xl:min-w-128"
+					bind:value={title}
+					placeholder="Yeh I remembaw..."
+				/>
+			</label>
 
-			<button aria-label="New" class="mr-3 ml-3 align-middle text-green-600" onclick={newGlawski}>
+			<button
+				aria-label="New"
+				title="Start fresh (clears da editor and da mix)"
+				class="mr-3 ml-3 align-middle text-green-600"
+				onclick={newGlawski}
+			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					fill="none"
@@ -636,6 +750,7 @@
 
 			<button
 				aria-label="Save"
+				title="Save + copy a share link"
 				class="align-middle text-blue-400 disabled:text-slate-500"
 				disabled={saving || loading}
 				onclick={saveGlawski}
@@ -657,8 +772,9 @@
 
 		{#if active.audioFile}
 			<div class="mt-5 rounded-xl border border-solid border-slate-700 p-4">
-				<div class="mb-3 flex items-center gap-3">
+				<div class="mb-3 flex flex-wrap items-center gap-3">
 					<div class="text-xl">Da Slice</div>
+					<span class="text-sm text-slate-400">carve a chunk of the track to loop</span>
 
 					{#if editingIndex >= 0}
 						<span class="rounded-full bg-yellow-500/20 px-3 py-0.5 text-sm text-yellow-400">
@@ -684,6 +800,7 @@
 				<div class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-3">
 					<button
 						aria-label={isLoopingActive && decks.playing ? 'Pause loop' : 'Play loop'}
+						title={loopBtnTitle}
 						class="disabled:text-slate-600"
 						disabled={decks.loading && isLoopingActive}
 						onclick={toggleLoopPlay}
@@ -719,8 +836,8 @@
 						{/if}
 					</button>
 
-					<label>
-						<span class="mr-1 text-slate-400">Start</span>
+					<label title="Where da slice starts, in seconds">
+						<span class="mr-1 text-slate-400">Start (s)</span>
 						<input
 							type="text"
 							class="w-24 border border-solid border-slate-500 p-2"
@@ -729,8 +846,8 @@
 						/>
 					</label>
 
-					<label>
-						<span class="mr-1 text-slate-400">Length</span>
+					<label title="How long da slice is, in seconds">
+						<span class="mr-1 text-slate-400">Length (s)</span>
 						<input
 							type="text"
 							class="w-24 border border-solid border-slate-500 p-2"
@@ -739,7 +856,7 @@
 						/>
 					</label>
 
-					<label>
+					<label title="How many times dis slice repeats when it's a step in da mix">
 						<span class="mr-1 text-slate-400">Loops</span>
 						<input
 							type="number"
@@ -770,19 +887,22 @@
 		{/if}
 
 		<div class="mt-8 rounded-xl border border-solid border-slate-700 p-4">
-			<div class="flex items-center gap-3">
+			<div class="flex flex-wrap items-center gap-3">
 				<div class="text-xl">Da Mix</div>
-				{#if mix.length}
-					<span class="text-sm text-slate-400">
-						{mix.length} step{mix.length === 1 ? '' : 's'} &middot; {formatTime(mixTotal)}
-					</span>
-				{/if}
+				<span class="text-sm text-slate-400">
+					{#if mix.length}
+						{mix.length} step{mix.length === 1 ? '' : 's'} &middot; {formatTime(mixTotal)} per pass
+					{:else}
+						your slices, played back to back
+					{/if}
+				</span>
 			</div>
 
 			{#if mix.length}
 				<div class="mt-3 flex flex-wrap items-center gap-4">
 					<button
 						aria-label={decks.mode === 'mix' && decks.playing ? 'Pause mix' : 'Play mix'}
+						title={mixBtnTitle}
 						class="disabled:text-slate-600"
 						disabled={decks.loading && decks.mode === 'mix'}
 						onclick={toggleMixPlay}
@@ -799,6 +919,7 @@
 
 					<button
 						aria-label="Stop"
+						title="Stop and rewind"
 						class="text-slate-300 hover:text-white disabled:text-slate-600"
 						disabled={decks.mode !== 'mix'}
 						onclick={() => decks.stop()}
@@ -806,6 +927,21 @@
 						{@render icon(
 							'M5.25 7.5A2.25 2.25 0 0 1 7.5 5.25h9a2.25 2.25 0 0 1 2.25 2.25v9a2.25 2.25 0 0 1-2.25 2.25h-9a2.25 2.25 0 0 1-2.25-2.25v-9Z',
 							'size-7'
+						)}
+					</button>
+
+					<button
+						aria-label="Loop da mix"
+						aria-pressed={decks.loopMix}
+						title={decks.loopMix
+							? 'Mix repeats forever (click to play it once through)'
+							: 'Mix plays once (click to loop it forever)'}
+						class={decks.loopMix ? 'text-violet-400' : 'text-slate-500 hover:text-slate-300'}
+						onclick={() => decks.toggleLoopMix()}
+					>
+						{@render icon(
+							'M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99',
+							'size-6'
 						)}
 					</button>
 
@@ -825,9 +961,13 @@
 					</button>
 				</div>
 
+				<div class="mt-3 text-[10px] tracking-[0.2em] text-slate-500">
+					TIMELINE &mdash; one block per step, click to jump
+				</div>
 				<button
-					class="relative mt-3 block h-4 w-full cursor-pointer overflow-hidden rounded bg-slate-800"
+					class="relative mt-1 block h-4 w-full cursor-pointer overflow-hidden rounded bg-slate-800"
 					aria-label="Mix position"
+					title="Click to jump"
 					onclick={seekBar}
 				>
 					<span class="flex h-full">
@@ -851,7 +991,18 @@
 					{/if}
 				</button>
 
-				<div class="mt-3 divide-y divide-slate-800 border-t border-b border-slate-800">
+				<div
+					class="mt-3 hidden items-center gap-2 px-2 text-[10px] tracking-[0.2em] text-slate-500 md:flex"
+				>
+					<span class="w-6 text-right">#</span>
+					<span class="w-5"></span>
+					<span class="grow">SLICE</span>
+					<span class="w-[92px] text-center">REPEATS</span>
+					<span class="w-16 text-right">STEP TIME</span>
+					<span class="w-[136px] text-center">TOOLS</span>
+				</div>
+
+				<div class="mt-3 divide-y divide-slate-800 border-t border-b border-slate-800 md:mt-1">
 					{#each mix as s, i (s.id)}
 						<div
 							class="flex flex-wrap items-center gap-2 px-2 py-2 {i === currentStep
