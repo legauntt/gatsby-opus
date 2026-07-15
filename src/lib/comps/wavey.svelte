@@ -7,8 +7,8 @@
 		duration: number;
 		paused: boolean;
 
-		onSeek: Function;
-		onTogglePause: Function;
+		onSeek: (newTime: number) => void;
+		onTogglePause: () => void;
 
 		/** Audio file to render an actual waveform for. Optional: without it
 		 *  (or before it decodes) we fall back to a plain progress bar. */
@@ -18,9 +18,6 @@
 			start: number;
 			end: number;
 		};
-
-		label?: string;
-		editor?: boolean;
 	}
 
 	let props: IWaveyProps = $props();
@@ -61,8 +58,8 @@
 		return 'rest';
 	};
 
-	const previewSeek = (e: any) => {
-		const div = e.currentTarget;
+	const previewSeek = (e: MouseEvent) => {
+		const div = e.currentTarget as HTMLElement;
 		const { left, width } = div.getBoundingClientRect();
 
 		let p = (e.clientX - left) / width;
@@ -72,10 +69,10 @@
 		previewSeekValue = formatTime(p * props.duration);
 	};
 
-	const dragsYaDown = (e: any) => {
-		const div = e.currentTarget;
+	const dragsYaDown = (e: PointerEvent) => {
+		const div = e.currentTarget as HTMLElement;
 
-		function seek(e: any) {
+		function seek(e: PointerEvent) {
 			const { left, width } = div.getBoundingClientRect();
 
 			let p = (e.clientX - left) / width;
@@ -158,7 +155,7 @@
 					title={previewSeekValue}
 					role="tooltip"
 				>
-					{#each peaks as peak, i}
+					{#each peaks as peak, i (i)}
 						{@const state = barState(i, peaks.length)}
 						<div
 							class="pointer-events-none flex-1 rounded-full"

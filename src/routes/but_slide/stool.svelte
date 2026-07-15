@@ -8,19 +8,18 @@
 		paused: boolean;
 		currentTime: number;
 		muted: boolean;
-		volume: number;
 		duration: number;
 		loop: boolean;
-		onTogglePause: Function;
-		onSeek: Function;
-		onLoopChange: Function;
-		onDelete: Function;
-		onToggleMute: Function;
-		onChangeStartType: Function;
-		onChangeMaxInstances: Function;
-		onChangeDieRoll: Function;
-		onChangeTrack: Function;
-		onChangeDelay: Function;
+		onTogglePause: () => void;
+		onSeek: (newTime: number) => void;
+		onLoopChange: (loop: boolean) => void;
+		onDelete: () => void;
+		onToggleMute: () => void;
+		onChangeStartType: (newValue: string) => void;
+		onChangeMaxInstances: (newValue: number) => void;
+		onChangeDieRoll: (newValue: number) => void;
+		onChangeTrack: (newTrack: string) => void;
+		onChangeDelay: (newValue: number) => void;
 
 		orca: {
 			startType: string;
@@ -39,8 +38,8 @@
 
 	const ERRRRRY_LASS_ONE: string[] = Object.values(TREASURE_TROVE).flat();
 
-	const verifyMaxInstances = (e: any) => {
-		let value = Number(e.currentTarget.value);
+	const verifyMaxInstances = (e: Event) => {
+		let value = Number((e.currentTarget as HTMLInputElement).value);
 		if (isNaN(value)) {
 			value = 1;
 		} else if (value <= 0) {
@@ -50,8 +49,8 @@
 		props.onChangeMaxInstances(value);
 	};
 
-	const verifyDelay = (e: any) => {
-		let value = Number(e.currentTarget.value);
+	const verifyDelay = (e: Event) => {
+		let value = Number((e.currentTarget as HTMLInputElement).value);
 		if (isNaN(value)) {
 			value = 1;
 		} else if (value <= 0) {
@@ -61,8 +60,8 @@
 		props.onChangeDelay(value);
 	};
 
-	const verifyDieRoll = (e: any) => {
-		let value = Number(e.currentTarget.value);
+	const verifyDieRoll = (e: Event) => {
+		let value = Number((e.currentTarget as HTMLInputElement).value);
 		if (isNaN(value)) {
 			value = 1;
 		} else if (value <= 0) {
@@ -76,12 +75,12 @@
 	 *
 	 * @param e
 	 */
-	const changeTrack = (e: any) => {
+	const changeTrack = (e: Event) => {
 		if (!props.paused) {
 			props.onTogglePause();
 		}
 
-		props.onChangeTrack(e.currentTarget.value);
+		props.onChangeTrack((e.currentTarget as HTMLSelectElement).value);
 	};
 </script>
 
@@ -93,13 +92,19 @@
 				onchange={(e) => changeTrack(e)}
 				value={props.audioFile}
 			>
-				{#each ERRRRRY_LASS_ONE as track}
+				{#each ERRRRRY_LASS_ONE as track (track)}
 					<option value={track}>{formatTrack(track)}</option>
 				{/each}
 			</select>
 		</div>
 		<div class="flex">
-			<Wavey {...props} />
+			<Wavey
+				currentTime={props.currentTime}
+				duration={props.duration}
+				paused={props.paused}
+				onSeek={props.onSeek}
+				onTogglePause={props.onTogglePause}
+			/>
 			<div class="mt-5 ml-3 w-16">
 				<input
 					title="Loop"
