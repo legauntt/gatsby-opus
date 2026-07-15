@@ -325,7 +325,12 @@
 
 <div bind:this={container}>
 	{#if buffer}
-		<div class="rounded-2xl bg-slate-800 px-2 py-1">
+		<div class="relative rounded-2xl bg-slate-800 px-2 py-1">
+			<span
+				class="pointer-events-none absolute top-1.5 left-3 z-10 rounded bg-slate-900/80 px-1.5 text-[10px] tracking-[0.2em] text-slate-400"
+			>
+				FULL TRACK
+			</span>
 			<canvas
 				bind:this={mainCanvas}
 				class="h-28 w-full touch-none"
@@ -343,7 +348,12 @@
 			></canvas>
 		</div>
 
-		<div class="mt-2 rounded-2xl bg-slate-800 px-2 py-1">
+		<div class="relative mt-2 rounded-2xl bg-slate-800 px-2 py-1">
+			<span
+				class="pointer-events-none absolute top-1.5 left-3 z-10 rounded bg-slate-900/80 px-1.5 text-[10px] tracking-[0.2em] text-slate-400"
+			>
+				CLOSE-UP
+			</span>
 			<canvas
 				bind:this={zoomCanvas}
 				class="h-24 w-full touch-none"
@@ -361,7 +371,7 @@
 			></canvas>
 			<div class="flex justify-between px-1 pb-1 text-xs text-slate-500">
 				<span>{fmtTick(zoomWin.s, 1)}</span>
-				<span>zoomed in on da slice</span>
+				<span>same slice, zoomed in &mdash; fine-tune the edges here</span>
 				<span>{fmtTick(zoomWin.e, 1)}</span>
 			</div>
 		</div>
