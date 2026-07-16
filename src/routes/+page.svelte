@@ -167,8 +167,11 @@
 			{/each}
 		</div>
 
-		<div class="mt-8">
+		<div class="mt-8 flex flex-col gap-2">
 			<a href="/wtc" class="text-yellow-500 hover:underline">What The C?...</a>
+			<a href="/but_dance" class="text-yellow-500 hover:underline">
+				Butterfly Dance &mdash; watch a flock dance to da music
+			</a>
 		</div>
 	</div>
 </div>
