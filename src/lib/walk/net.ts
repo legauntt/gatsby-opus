@@ -15,8 +15,49 @@
  * ring buffer, timestamped on RECEIPT so peer clock skew never matters.
  */
 import type { AvatarCustom } from './avatar';
+import { env } from '$env/dynamic/public';
 
 export type NetStatus = 'local' | 'connecting' | 'hosting' | 'joined' | 'error';
+
+/**
+ * ICE + signaling config for cross-device PeerJS (Path A: bring your own TURN).
+ * Public STUN is always on. Set these in .env to make cross-device reliable
+ * behind symmetric NATs (see .env.example for Cloudflare/Twilio/Metered/self-host):
+ *   PUBLIC_TURN_URL         one or more (comma-separated) turn:/turns: URLs
+ *   PUBLIC_TURN_USERNAME    TURN username / key
+ *   PUBLIC_TURN_CREDENTIAL  TURN credential / secret
+ * Optional self-hosted PeerServer (removes the free broker's rate limits):
+ *   PUBLIC_PEER_HOST / PUBLIC_PEER_PORT / PUBLIC_PEER_PATH / PUBLIC_PEER_SECURE
+ * All optional: with none set, behaviour is exactly the STUN-only free broker.
+ */
+function iceServers(): RTCIceServer[] {
+	const servers: RTCIceServer[] = [
+		{ urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] }
+	];
+	const turn = env.PUBLIC_TURN_URL?.trim();
+	if (turn) {
+		servers.push({
+			urls: turn.split(',').map((u) => u.trim()).filter(Boolean),
+			username: env.PUBLIC_TURN_USERNAME,
+			credential: env.PUBLIC_TURN_CREDENTIAL
+		});
+	}
+	return servers;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function peerJsOptions(): Record<string, any> {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const opts: Record<string, any> = { config: { iceServers: iceServers() } };
+	const host = env.PUBLIC_PEER_HOST?.trim();
+	if (host) {
+		opts.host = host;
+		opts.path = env.PUBLIC_PEER_PATH || '/';
+		opts.secure = env.PUBLIC_PEER_SECURE !== 'false';
+		if (env.PUBLIC_PEER_PORT) opts.port = Number(env.PUBLIC_PEER_PORT);
+	}
+	return opts;
+}
 
 export interface PlayerSnapshot {
 	x: number;
@@ -96,6 +137,8 @@ class PeerTransport implements Transport {
 	private hostId: string;
 	private closed = false;
 	private attempts = 0;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	private opts: Record<string, any>;
 
 	constructor(
 		room: string,
@@ -104,6 +147,7 @@ class PeerTransport implements Transport {
 		private onStatus: (s: NetStatus) => void
 	) {
 		this.hostId = 'tct-field-' + slug(room);
+		this.opts = peerJsOptions(); // STUN + optional TURN/self-host signaling
 		this.becomeHost();
 	}
 
@@ -111,7 +155,7 @@ class PeerTransport implements Transport {
 		if (this.closed) return;
 		this.isHost = false;
 		this.onStatus('connecting');
-		const peer = new this.Peer(this.hostId);
+		const peer = new this.Peer(this.hostId, this.opts);
 		this.peer = peer;
 		peer.on('open', () => {
 			this.isHost = true;
@@ -146,7 +190,7 @@ class PeerTransport implements Transport {
 		if (this.closed) return;
 		this.isHost = false;
 		this.onStatus('connecting');
-		const peer = new this.Peer();
+		const peer = new this.Peer(this.opts); // random id + our ICE/signaling config
 		this.peer = peer;
 		peer.on('open', () => {
 			const conn = peer.connect(this.hostId, { reliable: true });
