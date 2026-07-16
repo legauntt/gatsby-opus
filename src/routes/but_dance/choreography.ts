@@ -24,9 +24,12 @@ export interface Dancer {
 	u: number; // slot parameter 0..1
 	seed: number;
 	flapRate: number; // Hz-ish, feeds mixer.update(dt * flapRate)
+	flapRateMul: number; // per-individual natural flap frequency (breaks sync)
 	burst: number; // transient flap multiplier from beats, decays
 	quat: THREE.Quaternion;
 	bank: number;
+	wanderGain: number; // per-individual wander strength (no two drift alike)
+	scale: number; // per-individual size (page multiplies MODEL_SCALE by this)
 }
 
 export interface AudioFrame {
@@ -168,17 +171,20 @@ export class Flock {
 			const u = i / n;
 			this.dancers.push({
 				pos: new THREE.Vector3(
-					(Math.random() - 0.5) * 10,
-					(Math.random() - 0.5) * 6,
-					(Math.random() - 0.5) * 10
+					(Math.random() - 0.5) * 14,
+					(Math.random() - 0.5) * 8,
+					(Math.random() - 0.5) * 14
 				),
 				vel: new THREE.Vector3(),
 				u,
 				seed: Math.random() * 1000,
-				flapRate: 6,
+				flapRate: 4 + Math.random() * 4,
+				flapRateMul: 0.82 + Math.random() * 0.42, // ~0.82..1.24x
 				burst: 0,
 				quat: new THREE.Quaternion(),
-				bank: 0
+				bank: 0,
+				wanderGain: 0.7 + Math.random() * 0.7, // ~0.7..1.4x
+				scale: 0.78 + Math.random() * 0.5 // ~0.78..1.28x
 			});
 		}
 	}
@@ -253,10 +259,11 @@ export class Flock {
 			}
 			this._acc.addScaledVector(this._sep, sep);
 
-			// wander (cheap curl-ish noise via layered sines on seed)
-			const w = t * 0.6 + d.seed;
+			// wander (cheap curl-ish noise via layered sines on seed); the per-
+			// individual rate + gain give every dancer its own drifting "gait"
+			const w = t * (0.45 + 0.3 * (d.seed % 1)) + d.seed;
 			this._tmp.set(Math.sin(w * 1.1) + Math.sin(w * 2.3) * 0.5, Math.cos(w * 0.9) * 0.7, Math.sin(w * 1.7 + 2) + Math.cos(w * 0.6));
-			this._acc.addScaledVector(this._tmp, wander);
+			this._acc.addScaledVector(this._tmp, wander * d.wanderGain);
 
 			// swirl tangent around Y for a touch of vortex
 			this._tmp.set(-d.pos.z, 0, d.pos.x).normalize().multiplyScalar(this.swirlSign * (0.6 + audio.mids * 2.0));
@@ -303,7 +310,7 @@ export class Flock {
 			const speedN = Math.min(1, sp / (vmax + 1e-3));
 			d.burst = Math.max(0, d.burst - dt * 2.2);
 			d.flapRate = THREE.MathUtils.clamp(
-				5 * (0.55 + 0.8 * speedN) * (1 + 0.7 * audio.treble) * (1 + d.burst),
+				5 * d.flapRateMul * (0.55 + 0.8 * speedN) * (1 + 0.7 * audio.treble) * (1 + d.burst),
 				audio.live ? 2.5 : 1.4,
 				14
 			);
