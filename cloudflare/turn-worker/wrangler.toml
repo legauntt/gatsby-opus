@@ -1,0 +1,13 @@
+name = "tct-turn"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+
+[vars]
+# Lock this to your site's origin in production, e.g. "https://yoursite.com"
+ALLOW_ORIGIN = "*"
+# Credential lifetime in seconds (24h). Covers a play session; refetched on next join.
+TURN_TTL = "86400"
+
+# Secrets (do NOT put these here) -- set with:
+#   wrangler secret put TURN_KEY_ID
+#   wrangler secret put TURN_KEY_API_TOKEN

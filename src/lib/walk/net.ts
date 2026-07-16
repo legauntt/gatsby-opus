@@ -45,10 +45,33 @@ function iceServers(): RTCIceServer[] {
 	return servers;
 }
 
+/**
+ * Resolve the full ICE list. When PUBLIC_TURN_CREDENTIALS_URL is set (a small
+ * Cloudflare Worker that mints short-lived TURN creds server-side, see
+ * cloudflare/turn-worker/), fetch fresh iceServers at join time and append them
+ * to the STUN base. Any failure degrades to STUN-only -- never blocks joining.
+ */
+export async function resolveIceServers(): Promise<RTCIceServer[]> {
+	const base = iceServers();
+	const url = env.PUBLIC_TURN_CREDENTIALS_URL?.trim();
+	if (!url) return base;
+	try {
+		const r = await fetch(url, { method: 'GET' });
+		if (r.ok) {
+			const data = await r.json();
+			if (Array.isArray(data?.iceServers)) return [...base, ...data.iceServers];
+		}
+		console.warn('TURN creds endpoint returned no iceServers; using STUN only');
+	} catch (e) {
+		console.warn('TURN creds fetch failed; using STUN only', e);
+	}
+	return base;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function peerJsOptions(): Record<string, any> {
+export function peerJsOptions(ice: RTCIceServer[]): Record<string, any> {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const opts: Record<string, any> = { config: { iceServers: iceServers() } };
+	const opts: Record<string, any> = { config: { iceServers: ice } };
 	const host = env.PUBLIC_PEER_HOST?.trim();
 	if (host) {
 		opts.host = host;
@@ -144,10 +167,11 @@ class PeerTransport implements Transport {
 		room: string,
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		private Peer: any,
-		private onStatus: (s: NetStatus) => void
+		private onStatus: (s: NetStatus) => void,
+		ice: RTCIceServer[]
 	) {
 		this.hostId = 'tct-field-' + slug(room);
-		this.opts = peerJsOptions(); // STUN + optional TURN/self-host signaling
+		this.opts = peerJsOptions(ice); // STUN (+ TURN) + optional self-host signaling
 		this.becomeHost();
 	}
 
@@ -312,7 +336,8 @@ export class NetSession {
 			const mod = await import('peerjs');
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const Peer = (mod as any).default ?? (mod as any).Peer;
-			const t = new PeerTransport(code, Peer, (s) => this.opts.onStatus?.(s));
+			const ice = await resolveIceServers(); // fetch short-lived TURN creds if configured
+			const t = new PeerTransport(code, Peer, (s) => this.opts.onStatus?.(s), ice);
 			t.onMessage((m) => this.handle(m));
 			this.transports.push(t);
 			this.peerTransport = t;
