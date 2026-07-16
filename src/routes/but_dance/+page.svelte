@@ -35,6 +35,8 @@
 	const N_BUTTERFLIES = 40;
 	const MODEL_SCALE = 13; // GLB is ~0.1u wide; scale so wingspan reads big
 	const FLOCK_HEIGHT = 6; // butterflies dance this high above the walker
+	const TAU = Math.PI * 2;
+	const FLAP_ASYM = 0.5; // >0: fast downstroke, slower recovery -> less mechanical
 
 	// svelte-ignore non_reactive_update
 	let container: HTMLDivElement;
@@ -355,6 +357,8 @@
 		const flock = new Flock(N_BUTTERFLIES);
 		const roots: THREE.Object3D[] = [];
 		const mixers: THREE.AnimationMixer[] = [];
+		const actions: THREE.AnimationAction[] = [];
+		let flapDuration = 1;
 		const wingMats: THREE.MeshStandardMaterial[] = [];
 		const flockGroup = new THREE.Group();
 		scene.add(flockGroup);
@@ -363,6 +367,7 @@
 			.loadAsync('/but_dance/monarch.glb')
 			.then((gltf) => {
 				const flapClip = gltf.animations.find((a) => /flap/i.test(a.name)) ?? gltf.animations[0];
+				flapDuration = flapClip?.duration || 1;
 				gltf.scene.traverse((o) => {
 					const m = (o as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined;
 					if (m && /wing/i.test(m.name)) {
@@ -374,7 +379,7 @@
 				});
 				for (let i = 0; i < N_BUTTERFLIES; i++) {
 					const root = skeletonClone(gltf.scene);
-					root.scale.setScalar(MODEL_SCALE);
+					root.scale.setScalar(MODEL_SCALE * flock.dancers[i].scale);
 					const mixer = new THREE.AnimationMixer(root);
 					const action = mixer.clipAction(flapClip);
 					action.play();
@@ -382,6 +387,7 @@
 					flockGroup.add(root);
 					roots.push(root);
 					mixers.push(mixer);
+					actions.push(action);
 				}
 				loadingGlb = false;
 				formationName = flock.formationName;
@@ -437,7 +443,13 @@
 				const d = flock.dancers[i];
 				roots[i].position.copy(d.pos);
 				roots[i].quaternion.copy(d.quat);
-				mixers[i].update(dt * d.flapRate);
+				// natural wingbeat: warp playback speed by cycle phase (fast
+				// downstroke, slower recovery) + faint per-individual flutter so
+				// the flock never falls into lockstep
+				const phase = (actions[i].time / flapDuration) % 1;
+				const warp = 1 + FLAP_ASYM * Math.cos(TAU * phase);
+				const flutter = 1 + 0.1 * Math.sin(t * 11 + d.seed);
+				mixers[i].update(dt * d.flapRate * warp * flutter);
 			}
 			if (roots.length && flock.formationName !== formationName) formationName = flock.formationName;
 			const targetShimmer = audioFrame.treble * 0.5 + (audioFrame.beat ? 0.4 : 0);
