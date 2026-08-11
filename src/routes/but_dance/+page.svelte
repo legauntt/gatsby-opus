@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { replaceState } from '$app/navigation';
+	import { page } from '$app/state';
 	import * as THREE from 'three';
 	import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 	import { clone as skeletonClone } from 'three/addons/utils/SkeletonUtils.js';
@@ -25,7 +27,7 @@
 		type AvatarCustom
 	} from '$lib/walk/avatar';
 	import { createController, type Controller } from '$lib/walk/controller';
-	import { NetSession, type NetStatus } from '$lib/walk/net';
+	import { NetSession, CHAT_MAX, type NetStatus, type ChatEvent } from '$lib/walk/net';
 	import { RemoteAvatars } from '$lib/walk/remotes';
 
 	const KEYS = ['DEMON', 'BONUS', 'SEVEN', 'CLICES'];
@@ -64,8 +66,17 @@
 	let avatarParams = $state<AvatarCustom>({ ...DEFAULT_CUSTOM });
 	let playerName = $state('Denny');
 	let roomCode = $state('');
+	let joinedCode = $state(''); // the code we actually joined with (roomCode stays editable)
 	let netStatus = $state<NetStatus>('local');
 	let playerCount = $state(1);
+
+	// chat
+	let chatLog = $state<(ChatEvent & { key: number })[]>([]);
+	let chatDraft = $state('');
+	let chatSeq = 0;
+	let chatInput: HTMLInputElement | undefined;
+	// svelte-ignore non_reactive_update
+	let chatList: HTMLDivElement | undefined;
 
 	// module handles (set in onMount; used by $effects + UI handlers)
 	let controller: Controller | null = null;
@@ -183,6 +194,18 @@
 		avatarParams = { ...randomCustom() };
 	};
 
+	/** Mirror the room into ?room= so the address bar itself is the invite. */
+	const setRoomParam = (code: string | null) => {
+		const url = new URL(location.href);
+		if (code) url.searchParams.set('room', code);
+		else url.searchParams.delete('room');
+		try {
+			replaceState(url, {});
+		} catch {
+			// router not ready -- cosmetic only
+		}
+	};
+
 	const joinRoom = async () => {
 		const code = roomCode.trim();
 		if (!code) {
@@ -190,17 +213,65 @@
 			return;
 		}
 		netStatus = 'connecting';
+		joinedCode = code;
+		setRoomParam(code);
 		await net?.joinRoom(code);
 	};
-	const leaveRoom = () => net?.leaveRoom();
+	const leaveRoom = () => {
+		net?.leaveRoom();
+		joinedCode = '';
+		setRoomParam(null);
+	};
 	const rollRoom = () => (roomCode = 'field-' + Math.random().toString(36).slice(2, 6));
+
+	const inRoom = $derived(netStatus === 'hosting' || netStatus === 'joined');
+	const inviteUrl = $derived(
+		inRoom ? `${page.url.origin}${page.url.pathname}?room=${encodeURIComponent(joinedCode)}` : ''
+	);
+	const copyInvite = async () => {
+		if (!inviteUrl) return;
+		try {
+			await navigator.clipboard.writeText(inviteUrl);
+			toast.success('Invite link copied — send it to a friend');
+		} catch {
+			toast.error("Couldn't copy — select the link and copy it yourself");
+		}
+	};
+
+	// chat: Enter focuses the box, Enter again sends (and hands keys back to WASD)
+	const sendChat = () => {
+		const t = chatDraft.trim();
+		chatDraft = '';
+		if (t) net?.sendChat(t);
+		chatInput?.blur();
+	};
+	const onChatKeydown = (e: KeyboardEvent) => {
+		if (e.key === 'Enter') {
+			e.preventDefault();
+			sendChat();
+		} else if (e.key === 'Escape') {
+			chatDraft = '';
+			chatInput?.blur();
+		}
+	};
+	/** Stable per-player name color so you can tell who's talking at a glance. */
+	const nameHue = (id: string) => {
+		let h = 0;
+		for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) % 360;
+		return h;
+	};
+
+	$effect(() => {
+		void chatLog.length; // rerun on new messages
+		chatList?.scrollTo({ top: chatList.scrollHeight });
+	});
 
 	const netLabel = $derived(
 		{
 			local: 'Solo / same-device tabs',
 			connecting: 'Connecting…',
-			hosting: 'Hosting room ' + roomCode,
-			joined: 'In room ' + roomCode,
+			hosting: 'Hosting room ' + joinedCode,
+			joined: 'In room ' + joinedCode,
 			error: 'Connection failed'
 		}[netStatus]
 	);
@@ -305,9 +376,31 @@
 			custom: $state.snapshot(avatarParams),
 			onStatus: (s) => (netStatus = s),
 			onCount: (n) => (playerCount = n),
-			onError: (m) => toast.error(m)
+			onError: (m) => toast.error(m),
+			onChat: (c) => (chatLog = [...chatLog, { ...c, key: chatSeq++ }].slice(-60))
 		});
 		net.startLocal('field');
+
+		// arrived via an invite link (?room=code): hop straight into that room
+		const urlRoom = page.url.searchParams.get('room')?.trim();
+		if (urlRoom) {
+			roomCode = urlRoom;
+			joinedCode = urlRoom;
+			showMultiplayer = true; // so the connection status is visible
+			netStatus = 'connecting';
+			toast('Joining room ' + urlRoom + '…');
+			net.joinRoom(urlRoom);
+		}
+
+		// Enter (while not already typing) jumps to the chat box
+		const onGlobalKey = (e: KeyboardEvent) => {
+			if (e.key !== 'Enter') return;
+			const el = document.activeElement as HTMLElement | null;
+			if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || el.isContentEditable)) return;
+			e.preventDefault();
+			chatInput?.focus();
+		};
+		window.addEventListener('keydown', onGlobalKey);
 
 		// prefs are loaded and the avatar/net exist -- allow persist effects to run
 		restored = true;
@@ -501,6 +594,7 @@
 			cancelAnimationFrame(raf);
 			document.removeEventListener('visibilitychange', onVisibility);
 			window.removeEventListener('pagehide', onPageHide);
+			window.removeEventListener('keydown', onGlobalKey);
 			ro.disconnect();
 
 			controller?.dispose();
@@ -706,8 +800,8 @@
 				</button>
 			</div>
 			<p class="mb-3 text-xs text-slate-400">
-				Same-device tabs already share this field automatically. To walk with someone on another device, share a
-				room code &mdash; first one in hosts.
+				Same-device tabs already share this field automatically. To walk with someone on another device, join a
+				room (first one in hosts), then send them your invite link.
 			</p>
 			<label class="mb-2 block text-sm text-slate-200">
 				<span class="mb-1 block">Name</span>
@@ -727,8 +821,30 @@
 					</button>
 				</div>
 			</label>
+			{#if inviteUrl}
+				<div class="mb-2">
+					<span class="mb-1 block text-sm text-slate-200">Invite link</span>
+					<div class="flex gap-1">
+						<input
+							type="text"
+							readonly
+							class="w-full rounded border border-slate-500 bg-black/60 p-1.5 text-xs text-white"
+							value={inviteUrl}
+							onfocus={(e) => e.currentTarget.select()}
+						/>
+						<button
+							title="Copy the invite link"
+							class="rounded border border-slate-500 px-2 text-sm text-white hover:border-white"
+							onclick={copyInvite}
+						>
+							Copy
+						</button>
+					</div>
+					<p class="mt-1 text-xs text-slate-400">Friends who open this link land straight in your room.</p>
+				</div>
+			{/if}
 			<div class="flex gap-2">
-				{#if netStatus === 'hosting' || netStatus === 'joined'}
+				{#if inRoom}
 					<button class="flex-1 rounded-full bg-red-600 px-3 py-1 text-sm font-bold hover:bg-red-500" onclick={leaveRoom}>Leave room</button>
 				{:else}
 					<button
@@ -740,11 +856,38 @@
 					</button>
 				{/if}
 			</div>
-			<div class="mt-2 text-xs" class:text-green-300={netStatus === 'hosting' || netStatus === 'joined'} class:text-red-300={netStatus === 'error'} class:text-slate-400={netStatus === 'local' || netStatus === 'connecting'}>
+			<div class="mt-2 text-xs" class:text-green-300={inRoom} class:text-red-300={netStatus === 'error'} class:text-slate-400={netStatus === 'local' || netStatus === 'connecting'}>
 				{netLabel} &middot; {playerCount} here
 			</div>
 		</div>
 	{/if}
+
+	<!-- chat (bottom-left, above the music bar) -->
+	<div class="absolute bottom-24 left-4 flex w-72 max-w-[80vw] flex-col gap-1">
+		{#if chatLog.length}
+			<div
+				bind:this={chatList}
+				class="max-h-40 space-y-0.5 overflow-y-auto rounded-lg bg-black/40 p-2 text-sm backdrop-blur"
+			>
+				{#each chatLog as c (c.key)}
+					<div class="break-words text-white/90">
+						<span class="font-bold" style:color={`hsl(${nameHue(c.id)} 80% 75%)`}>{c.name}:</span>
+						{c.text}
+					</div>
+				{/each}
+			</div>
+		{/if}
+		<input
+			bind:this={chatInput}
+			type="text"
+			class="w-full rounded-full border border-white/30 bg-black/40 px-3 py-1.5 text-sm text-white placeholder-white/60 backdrop-blur focus:border-white focus:outline-none"
+			placeholder="Press Enter to chat…"
+			title="Chat with everyone in the field — Enter sends, Esc closes"
+			maxlength={CHAT_MAX}
+			bind:value={chatDraft}
+			onkeydown={onChatKeydown}
+		/>
+	</div>
 
 	<!-- bottom control bar (music) -->
 	<div class="absolute right-0 bottom-0 left-0 flex flex-wrap items-center gap-x-4 gap-y-2 bg-gradient-to-t from-black/70 to-transparent p-4">
@@ -791,7 +934,7 @@
 
 	<!-- controls hint -->
 	<div class="pointer-events-none absolute bottom-20 left-1/2 hidden -translate-x-1/2 rounded-full bg-black/45 px-4 py-1 text-xs text-white/90 backdrop-blur sm:block">
-		WASD move &middot; Shift run &middot; Space jump &middot; click field to look (Esc for menus) &middot; V toggles view
+		WASD move &middot; Shift run &middot; Space jump &middot; click field to look (Esc for menus) &middot; V toggles view &middot; Enter chats
 	</div>
 
 	<!-- first-visit tutorial -->
@@ -807,7 +950,8 @@
 				<ol class="mt-3 list-decimal space-y-2 pl-5 text-slate-300">
 					<li><span class="font-bold text-white">Walk around.</span> WASD to move, Shift to run, Space to hop. Click the field to look with the mouse (Esc frees the cursor for the menus). Press <span class="font-bold text-white">V</span> to swap between 3rd- and 1st-person.</li>
 					<li><span class="font-bold text-white">Make your guy.</span> Hit Customize to set colors, headwear, height and a name &mdash; it's saved for next time.</li>
-					<li><span class="font-bold text-white">Bring friends.</span> Open Multiplayer: other browser tabs join automatically; share a room code to walk together across devices.</li>
+					<li><span class="font-bold text-white">Bring friends.</span> Open Multiplayer: other browser tabs join automatically; to cross devices, join a room and copy the invite link &mdash; anyone who opens it lands right next to you.</li>
+					<li><span class="font-bold text-white">Say things.</span> Press <span class="font-bold text-white">Enter</span>, type, Enter again &mdash; chat reaches everyone in your field.</li>
 					<li><span class="font-bold text-white">Turn on the music.</span> Pick an album + track and hit Play &mdash; a flock of hyper-real monarchs dances to the beat above the field.</li>
 				</ol>
 				<button class="mt-4 rounded-full bg-violet-600 px-4 py-1.5 font-bold hover:bg-violet-500" onclick={dismissHelp}>Let's go</button>
