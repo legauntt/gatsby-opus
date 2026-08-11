@@ -29,11 +29,20 @@
 	import { createController, type Controller } from '$lib/walk/controller';
 	import { NetSession, CHAT_MAX, type NetStatus, type ChatEvent } from '$lib/walk/net';
 	import { RemoteAvatars } from '$lib/walk/remotes';
+	import {
+		createSurvivalWorld,
+		tickStats,
+		freshStats,
+		DRINK_AMOUNT,
+		EAT_AMOUNT,
+		type SurvivalWorld
+	} from '$lib/walk/survival';
 
 	const KEYS = ['DEMON', 'BONUS', 'SEVEN', 'CLICES'];
 	const LEARNED_KEY = 'tct_but_dance_walk_learned'; // bumped: re-onboard to walk controls
 	const AVATAR_KEY = 'tct_but_dance_avatar';
 	const NAME_KEY = 'tct_but_dance_name';
+	const SURVIVAL_KEY = 'tct_but_dance_survival';
 	const N_BUTTERFLIES = 40;
 	const MODEL_SCALE = 13; // GLB is ~0.1u wide; scale so wingspan reads big
 	const FLOCK_HEIGHT = 6; // butterflies dance this high above the walker
@@ -69,6 +78,17 @@
 	let joinedCode = $state(''); // the code we actually joined with (roomCode stays editable)
 	let netStatus = $state<NetStatus>('local');
 	let playerCount = $state(1);
+
+	// survival
+	let survivalOn = $state(true);
+	let stats = $state(freshStats());
+	let raining = $state(false);
+	let sheltered = $state(false);
+	let swimming = $state(false);
+	let prompt = $state<'' | 'drink' | 'eat'>('');
+	let wantInteract = false; // set by the E key, consumed in the frame loop
+	let lastInteract = 0;
+	let world: SurvivalWorld | null = null;
 
 	// chat
 	let chatLog = $state<(ChatEvent & { key: number })[]>([]);
@@ -192,6 +212,17 @@
 
 	const randomizeAvatar = () => {
 		avatarParams = { ...randomCustom() };
+	};
+
+	const toggleSurvival = () => {
+		survivalOn = !survivalOn;
+		if (survivalOn) stats = freshStats(); // fresh start, not a stale near-death state
+		else prompt = '';
+		try {
+			localStorage.setItem(SURVIVAL_KEY, survivalOn ? 'on' : 'off');
+		} catch {
+			// fine
+		}
 	};
 
 	/** Mirror the room into ?room= so the address bar itself is the invite. */
@@ -327,6 +358,7 @@
 			if (savedAvatar) avatarParams = { ...DEFAULT_CUSTOM, ...JSON.parse(savedAvatar) };
 			const savedName = localStorage.getItem(NAME_KEY);
 			if (savedName) playerName = savedName;
+			survivalOn = localStorage.getItem(SURVIVAL_KEY) !== 'off';
 		} catch {
 			// no storage -- defaults are fine
 		}
@@ -353,6 +385,10 @@
 
 		// green daytime biome (sky, fog, sun+hemi, ground, grass, foliage)
 		const biome: Biome = createBiome(scene);
+
+		// survival props: pond, lean-to, berry bushes, rainstorms (after the
+		// biome so the storm system can find scene.fog)
+		world = createSurvivalWorld(scene);
 
 		const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 500);
 
@@ -392,13 +428,16 @@
 			net.joinRoom(urlRoom);
 		}
 
-		// Enter (while not already typing) jumps to the chat box
+		// Enter (while not already typing) jumps to the chat box; E interacts
 		const onGlobalKey = (e: KeyboardEvent) => {
-			if (e.key !== 'Enter') return;
 			const el = document.activeElement as HTMLElement | null;
 			if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || el.isContentEditable)) return;
-			e.preventDefault();
-			chatInput?.focus();
+			if (e.key === 'Enter') {
+				e.preventDefault();
+				chatInput?.focus();
+			} else if (e.key === 'e' || e.key === 'E') {
+				wantInteract = true;
+			}
 		};
 		window.addEventListener('keydown', onGlobalKey);
 
@@ -565,6 +604,41 @@
 
 			biome.update(dt); // 7 wind + clouds
 
+			// 7.5 survival: storms/berries always animate; stats only when it's on
+			world!.update(dt, p);
+			raining = world!.raining;
+			if (survivalOn) {
+				swimming = world!.swimmingAt(p.x, p.z);
+				sheltered = world!.shelteredAt(p.x, p.z);
+				const bush = world!.nearestRipeBush(p.x, p.z);
+				prompt = world!.canDrinkAt(p.x, p.z) ? 'drink' : bush >= 0 ? 'eat' : '';
+				if (wantInteract) {
+					wantInteract = false;
+					const now = performance.now();
+					if (now - lastInteract > 700) {
+						if (prompt === 'drink') {
+							stats.water = Math.min(100, stats.water + DRINK_AMOUNT);
+							lastInteract = now;
+							toast('💧 Glug glug', { duration: 1200 });
+						} else if (prompt === 'eat') {
+							world!.eatBush(bush);
+							stats.food = Math.min(100, stats.food + EAT_AMOUNT);
+							lastInteract = now;
+							toast('🫐 Nom', { duration: 1200 });
+						}
+					}
+				}
+				tickStats(stats, dt, { running: st.running, swimming, sheltered, raining });
+				if (stats.health <= 0) {
+					// carried back to the meadow gate, roughed up but alive
+					stats = { ...freshStats(), health: 55, water: 60, food: 60 };
+					controller!.player.position.set((Math.random() - 0.5) * 4, biome.groundY, 7);
+					toast.error('You collapsed — the field carried you back to the gate');
+				}
+			} else {
+				wantInteract = false;
+			}
+
 			net!.sendState({
 				// 8 throttled ~12Hz
 				x: p.x,
@@ -602,6 +676,7 @@
 			remotes.dispose();
 			if (controller) scene.remove(controller.player);
 			localAvatar?.dispose();
+			world?.dispose();
 			biome.dispose();
 
 			audioEl?.pause();
@@ -663,6 +738,18 @@
 	</label>
 {/snippet}
 
+{#snippet statBar(label: string, value: number, cls: string, hint: string)}
+	<div title={hint}>
+		<div class="flex items-center justify-between text-[11px] leading-4 text-white/90">
+			<span>{label}</span>
+			<span>{Math.ceil(value)}</span>
+		</div>
+		<div class="h-1.5 overflow-hidden rounded-full bg-white/20">
+			<div class="h-full rounded-full {cls}" style:width={`${value}%`}></div>
+		</div>
+	</div>
+{/snippet}
+
 <svelte:head>
 	<title>Butterfly Field</title>
 	<meta name="description" content="Walk a green field with friends while monarchs dance to da music" />
@@ -716,6 +803,14 @@
 			onclick={() => (showMultiplayer = !showMultiplayer)}
 		>
 			Multiplayer
+		</button>
+		<button
+			title="Hunger, thirst, oxygen, rainstorms — turn the survival layer on or off"
+			class="rounded-full border border-white/60 bg-black/30 px-3 py-1 text-sm text-white backdrop-blur hover:border-white"
+			class:bg-emerald-600={survivalOn}
+			onclick={toggleSurvival}
+		>
+			Survival {survivalOn ? 'on' : 'off'}
 		</button>
 	</div>
 
@@ -889,6 +984,42 @@
 		/>
 	</div>
 
+	<!-- survival HUD (bottom-right, above the music bar) -->
+	{#if survivalOn}
+		<div class="absolute right-4 bottom-24 w-44 space-y-1.5 rounded-xl bg-black/40 p-2.5 backdrop-blur">
+			{@render statBar('❤️ Health', stats.health, 'bg-red-500', 'Drains when needs run dry or you get soaked; regenerates when fed and watered (double under the lean-to)')}
+			{@render statBar('💧 Water', stats.water, 'bg-sky-400', 'Ticks down as you walk (faster running). Drink at the pond with E — rain tops you up too')}
+			{@render statBar('🍖 Food', stats.food, 'bg-amber-500', 'Ticks down over time. Eat from red-berry bushes with E; berries regrow')}
+			{@render statBar('🫧 Oxygen', stats.oxygen, 'bg-cyan-300', 'Only drains while swimming in the deep pond — get out before it hits zero')}
+			{#if raining}
+				<div class="text-[11px] leading-4" class:text-emerald-300={sheltered} class:text-sky-200={!sheltered}>
+					{sheltered ? '⛺ Sheltered — cozy' : '🌧 Rain! Get under the lean-to'}
+				</div>
+			{/if}
+			{#if swimming}
+				<div class="text-[11px] leading-4 text-cyan-200">🌊 Swimming — oxygen draining</div>
+			{/if}
+		</div>
+	{/if}
+
+	<!-- survival interaction prompt -->
+	{#if survivalOn && prompt}
+		<div class="pointer-events-none absolute bottom-32 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-4 py-1.5 text-sm text-white backdrop-blur">
+			Press <span class="font-bold">E</span> to {prompt === 'drink' ? 'drink 💧' : 'eat berries 🫐'}
+		</div>
+	{/if}
+
+	<!-- survival vignettes: deep-water tint + low-health warning -->
+	{#if survivalOn && swimming}
+		<div class="pointer-events-none absolute inset-0 bg-cyan-500/15"></div>
+	{/if}
+	{#if survivalOn && stats.health < 30}
+		<div
+			class="pointer-events-none absolute inset-0 animate-pulse"
+			style:box-shadow={`inset 0 0 120px 40px rgba(220,38,38,${(0.65 * (30 - stats.health)) / 30})`}
+		></div>
+	{/if}
+
 	<!-- bottom control bar (music) -->
 	<div class="absolute right-0 bottom-0 left-0 flex flex-wrap items-center gap-x-4 gap-y-2 bg-gradient-to-t from-black/70 to-transparent p-4">
 		<label class="flex items-center gap-1" title="Which album to dance to">
@@ -934,7 +1065,7 @@
 
 	<!-- controls hint -->
 	<div class="pointer-events-none absolute bottom-20 left-1/2 hidden -translate-x-1/2 rounded-full bg-black/45 px-4 py-1 text-xs text-white/90 backdrop-blur sm:block">
-		WASD move &middot; Shift run &middot; Space jump &middot; click field to look (Esc for menus) &middot; V toggles view &middot; Enter chats
+		WASD move &middot; Shift run &middot; Space jump &middot; click field to look (Esc for menus) &middot; V toggles view &middot; Enter chats &middot; E interacts
 	</div>
 
 	<!-- first-visit tutorial -->
@@ -952,6 +1083,7 @@
 					<li><span class="font-bold text-white">Make your guy.</span> Hit Customize to set colors, headwear, height and a name &mdash; it's saved for next time.</li>
 					<li><span class="font-bold text-white">Bring friends.</span> Open Multiplayer: other browser tabs join automatically; to cross devices, join a room and copy the invite link &mdash; anyone who opens it lands right next to you.</li>
 					<li><span class="font-bold text-white">Say things.</span> Press <span class="font-bold text-white">Enter</span>, type, Enter again &mdash; chat reaches everyone in your field.</li>
+					<li><span class="font-bold text-white">Stay alive.</span> Water and food tick down &mdash; drink at the pond and eat red berries with <span class="font-bold text-white">E</span>, don't linger in the deep water, and duck under the lean-to when it rains. If health hits zero you wake up back at the gate. Just want to vibe? Flip the <span class="font-bold text-white">Survival</span> button off.</li>
 					<li><span class="font-bold text-white">Turn on the music.</span> Pick an album + track and hit Play &mdash; a flock of hyper-real monarchs dances to the beat above the field.</li>
 				</ol>
 				<button class="mt-4 rounded-full bg-violet-600 px-4 py-1.5 font-bold hover:bg-violet-500" onclick={dismissHelp}>Let's go</button>
