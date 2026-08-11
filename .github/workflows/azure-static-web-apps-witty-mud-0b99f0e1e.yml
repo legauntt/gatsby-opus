@@ -50,13 +50,30 @@ jobs:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
     runs-on: ubuntu-latest
     name: Close Pull Request Job
+    permissions:
+      id-token: write
+      contents: read
     steps:
+      - name: Install OIDC Client from Core Package
+        run: npm install @actions/core@1.6.0 @actions/http-client
+      - name: Get Id Token
+        uses: actions/github-script@v7
+        id: idtoken
+        with:
+          script: |
+            const coredemo = require('@actions/core')
+            return await coredemo.getIDToken()
+          result-encoding: string
       - name: Close Pull Request
         id: closepullrequest
         uses: Azure/static-web-apps-deploy@v1
         with:
           action: 'close'
-          # Without the token the close action can't delete the PR's staging
-          # environment; the leaked environments pile up until the 3-slot
-          # free-tier cap blocks every new PR preview deploy.
+          # This site uses GitHub OIDC deployment authorization
+          # (deploymentAuthPolicy: GitHub), so deployment tokens are rejected
+          # for every operation ("No matching static site found") and the
+          # close action must authenticate with an id token exactly like the
+          # build job. Without it, closed PRs leak their staging environments
+          # until the 3-slot free-tier cap blocks every new preview deploy.
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_WITTY_MUD_0B99F0E1E }}
+          github_id_token: ${{ steps.idtoken.outputs.result }}
