@@ -13,6 +13,9 @@
  * INCLUDING its avatar params + name, so there is no separate roster/hello sync
  * to get wrong. Remotes are rendered ~100ms in the past by interpolating a small
  * ring buffer, timestamped on RECEIPT so peer clock skew never matters.
+ *
+ * Chat rides the same transports as fire-and-forget 'chat' messages: no
+ * history, no acks — you see what was said while you were here.
  */
 import type { AvatarCustom } from './avatar';
 import { env } from '$env/dynamic/public';
@@ -112,7 +115,17 @@ type StateMsg = {
 	rn: boolean;
 };
 type ByeMsg = { k: 'bye'; id: string };
-type Msg = StateMsg | ByeMsg;
+type ChatMsg = { k: 'chat'; id: string; name: string; text: string };
+type Msg = StateMsg | ByeMsg | ChatMsg;
+
+export interface ChatEvent {
+	id: string;
+	name: string;
+	text: string;
+	self: boolean;
+}
+
+export const CHAT_MAX = 240;
 
 interface Transport {
 	send(m: Msg): void;
@@ -303,6 +316,7 @@ export interface NetSessionOpts {
 	onStatus?: (s: NetStatus) => void;
 	onCount?: (n: number) => void;
 	onError?: (msg: string) => void;
+	onChat?: (c: ChatEvent) => void;
 }
 
 export class NetSession {
@@ -373,6 +387,11 @@ export class NetSession {
 			if (this.peers.delete(m.id)) this.opts.onCount?.(this.peers.size + 1);
 			return;
 		}
+		if (m.k === 'chat') {
+			const text = String(m.text ?? '').slice(0, CHAT_MAX);
+			if (text) this.opts.onChat?.({ id: m.id, name: m.name || '???', text, self: false });
+			return;
+		}
 		if (m.k !== 'state') return;
 		const now = performance.now();
 		let rec = this.peers.get(m.id);
@@ -412,6 +431,19 @@ export class NetSession {
 
 	private sendBye(t: Transport) {
 		t.send({ k: 'bye', id: this.localId });
+	}
+
+	/**
+	 * Broadcast a chat line to everyone here (both transports) and echo it back
+	 * to our own UI — neither BroadcastChannel nor the host relay loops a
+	 * message back to its sender.
+	 */
+	sendChat(text: string) {
+		const t = text.trim().slice(0, CHAT_MAX);
+		if (!t) return;
+		const m: ChatMsg = { k: 'chat', id: this.localId, name: this.name, text: t };
+		for (const tr of this.transports) tr.send(m);
+		this.opts.onChat?.({ id: this.localId, name: this.name, text: t, self: true });
 	}
 
 	/** Prune stale peers; call each frame. */
