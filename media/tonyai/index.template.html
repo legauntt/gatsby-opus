@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="robots" content="noindex, nofollow, noarchive" />
+		<meta name="theme-color" content="#18221d" />
+		<meta
+			name="description"
+			content="Tony C's AI listening archive. Full songs, remixes and experimental renditions."
+		/>
+		<title>Tony / AI — The listening archive</title>
+		<link rel="icon" href="/favicon.ico" />
+		<link rel="stylesheet" href="/tonyai/tonyai.css" />
+		<script src="/tonyai/tonyai.js" defer></script>
+	</head>
+	<body>
+		<header class="masthead">
+			<a class="wordmark" href="/" aria-label="Tony C and the Truth home"
+				>TONY C<span>/</span><b>AI</b></a
+			><span class="archive-mark"><span></span> THE LISTENING ARCHIVE</span>
+		</header>
+		<main>
+			<section class="hero" aria-labelledby="title">
+				<div class="hero-copy">
+					<p class="eyebrow">A DIFFERENT TAKE ON THE TRUTH</p>
+					<h1 id="title">Tony,<br /><em>reimagined.</em></h1>
+					<p class="intro">
+						Remixes, alternate takes, and songs from the experiments. Every track, in full.
+					</p>
+					<div class="hero-actions">
+						<button class="primary" id="play-all" disabled>
+							<span aria-hidden="true">▶</span> Play the collection</button
+						><span class="hero-count"
+							>{{COUNT}} tracks <span aria-hidden="true">·</span> {{TIME}}</span
+						>
+					</div>
+				</div>
+				<div class="record-scene" aria-hidden="true">
+					<div class="sleeve">
+						<span class="sleeve-name">THE OTHER<br />SIDE OF TONY.</span
+						><span class="sleeve-note">ORIGINAL SPIRIT<br />NEW POSSIBILITIES</span
+						><span class="sleeve-number">{{COUNT}} / AI</span>
+					</div>
+					<div class="record">
+						<div class="record-label"><span>TONY C</span><b>AI</b><span>FULL LENGTH</span></div>
+					</div>
+					<span class="record-caption">SOME FAMILIAR. SOME FAR OUT.</span>
+				</div>
+			</section>
+			<section class="collection" aria-labelledby="collection-title">
+				<div class="collection-heading">
+					<h2 id="collection-title">The collection<span>.</span></h2>
+					<span class="collection-note">PRESS PLAY. SEE WHERE IT GOES.</span>
+				</div>
+				<div class="toolbar">
+					<label class="search"
+						><svg
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="1.7"
+							aria-hidden="true"
+						>
+							<circle cx="10.5" cy="10.5" r="6.5" />
+							<path d="m16 16 5 5" /></svg
+						><input
+							id="search"
+							type="search"
+							placeholder="Find a song or a version…"
+							aria-label="Search tracks"
+							disabled /></label
+					><span id="results-count" aria-live="polite">{{COUNT}} tracks</span
+					><label class="sort-label"
+						><span class="sr-only">Sort tracks</span
+						><select id="sort" disabled>
+							<option value="newest">Newest first</option>
+							<option value="title">Title A–Z</option>
+							<option value="duration">Longest first</option>
+						</select></label
+					>
+				</div>
+				<div class="list-labels" aria-hidden="true">
+					<span>TRACK / VERSION</span><span>TIME</span><span>KEEP IT</span>
+				</div>
+				<ol class="tracks" id="tracks">
+					{{TRACKS}}
+				</ol>
+				<div class="empty" id="empty" hidden>
+					<h3>No tracks found.</h3>
+					<p>Try another title or version name.</p>
+					<button id="clear-search" class="text-button">Clear search</button>
+				</div>
+				<p id="status" class="status" role="status" aria-live="polite">
+					Choose a track to start listening.
+				</p>
+				<noscript
+					><p class="status">
+						Enable JavaScript for the playlist player. Every MP3 download remains available above.
+					</p></noscript
+				>
+			</section>
+		</main>
+		<footer>
+			<a href="/">Tony C &amp; the Truth</a>
+			<p>AI-generated music &amp; remixes <span aria-hidden="true">·</span> Full MP3 downloads</p>
+			<span>THE EXPERIMENT CONTINUES.</span>
+		</footer>
+		<section class="player" id="player" aria-label="Now playing" hidden>
+			<div class="player-track">
+				<div class="mini-record" aria-hidden="true"><span></span></div>
+				<div>
+					<strong id="now-title"></strong
+					><span>Tony C <span aria-hidden="true">/</span> AI archive</span>
+				</div>
+			</div>
+			<div class="transport">
+				<button id="previous" class="icon-button" aria-label="Previous track">
+					<svg viewBox="0 0 24 24" aria-hidden="true">
+						<path d="M5 5v14h2V5zm14 0L8 12l11 7z" />
+					</svg></button
+				><button id="toggle" class="toggle" aria-label="Pause">
+					<span aria-hidden="true">Ⅱ</span></button
+				><button id="next" class="icon-button" aria-label="Next track">
+					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 5v14h2V5zM5 5v14l11-7z" /></svg>
+				</button>
+			</div>
+			<div class="timeline">
+				<span id="elapsed">0:00</span>
+				<div class="wave-seek">
+					<canvas id="waveform" aria-hidden="true"></canvas
+					><input
+						id="seek"
+						type="range"
+						min="0"
+						max="1"
+						step="0.01"
+						value="0"
+						aria-label="Playback position"
+					/>
+				</div>
+				<span id="duration">0:00</span>
+			</div>
+			<label class="volume"
+				><svg
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="1.7"
+					aria-hidden="true"
+				>
+					<path d="M11 4 5 9H2v6h3l6 5zm4 4c3 2 3 6 0 8m3-11c5 4 5 10 0 14" /></svg
+				><input
+					id="volume"
+					type="range"
+					min="0"
+					max="1"
+					step="0.01"
+					value="0.8"
+					aria-label="Volume"
+			/></label>
+			<button
+				id="repeat"
+				class="icon-button repeat"
+				aria-label="Play next automatically"
+				aria-pressed="true"
+			>
+				<svg
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="1.7"
+					aria-hidden="true"
+				>
+					<path d="m16 2 4 4-4 4M4 11V9a3 3 0 0 1 3-3h13M8 22l-4-4 4-4m12-1v2a3 3 0 0 1-3 3H4" />
+				</svg>
+			</button>
+		</section>
+		<audio id="audio" preload="none"></audio>
+	</body>
+</html>
