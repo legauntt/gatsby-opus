@@ -1,6 +1,6 @@
 # Tony / AI listening archive
 
-All 35 full MP3s from the approved `Music/troofs/mp3s` library are available at `/tonyai`. The page is unlisted, has no navigation link, and sends `noindex, nofollow, noarchive` in both its HTML and response headers. It is public to anyone with the URL; there is no access control.
+All 38 full MP3s from the approved `Music/troofs/mp3s` library are available at `/tonyai`, including the three Got It Made versions. The page is unlisted, has no navigation link, and sends `noindex, nofollow, noarchive` in both its HTML and response headers. It is public to anyone with the URL; there is no access control.
 
 The exact original MP3 files are tracked in `mp3s/` under URL-safe filenames and published as assets of the `tonyai-v1` GitHub release. They live outside `static/` to keep the Azure deployment within its size limit. `manifest.json` records original filenames, sizes, durations, and SHA-256 hashes. Audio is copied without re-encoding.
 
