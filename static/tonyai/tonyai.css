@@ -229,7 +229,7 @@ h1 em {
 	margin: 0 5px;
 }
 .cover-art {
-	width: min(100%, 480px);
+	width: min(100%, 720px);
 	margin: 0 auto;
 }
 .cover-portrait {
