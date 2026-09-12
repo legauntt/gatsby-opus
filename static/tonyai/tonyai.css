@@ -229,16 +229,10 @@ h1 em {
 	margin: 0 5px;
 }
 .cover-art {
-	width: 100%;
-	margin: 0;
+	width: min(100%, 480px);
+	margin: 0 auto;
 }
-.cover-pair {
-	display: grid;
-	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-	gap: 28px;
-	align-items: start;
-}
-.cover-pair a {
+.cover-portrait {
 	display: block;
 	min-width: 0;
 	border-radius: 4px;
@@ -247,7 +241,6 @@ h1 em {
 	display: block;
 	width: 100%;
 	height: auto;
-	aspect-ratio: 1;
 	border: 8px solid #fcfcf7;
 	border-radius: 4px;
 	box-shadow: 0 12px 28px #25302320;
@@ -698,9 +691,6 @@ body.has-player {
 	.hero-copy {
 		column-gap: 24px;
 	}
-	.cover-pair {
-		gap: 20px;
-	}
 	.hero-actions {
 		flex-wrap: wrap;
 		gap: 16px;
@@ -770,10 +760,6 @@ body.has-player {
 	}
 	.cover-art {
 		margin-top: 34px;
-	}
-	.cover-pair {
-		grid-template-columns: minmax(0, 1fr);
-		gap: 24px;
 	}
 	.cover-art figcaption {
 		font-size: 7px;
