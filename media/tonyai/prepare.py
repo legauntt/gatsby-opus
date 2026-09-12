@@ -32,7 +32,8 @@ def prepare(path):
             'bitrate':int(stream.get('bit_rate',0)),'sample_rate':int(stream['sample_rate']),'channels':stream['channels'],
             'modified':int(path.stat().st_mtime),'waveform':waveform}
 
-sources=sorted(SOURCE.glob('*.mp3'),key=lambda p:p.name.lower());assert sources,'No MP3 files found'
+excluded=set(json.loads((HERE/'excluded-sources.json').read_text('utf-8'))['filenames'])
+sources=sorted((p for p in SOURCE.glob('*.mp3') if p.name not in excluded),key=lambda p:p.name.lower());assert sources,'No MP3 files found'
 with ThreadPoolExecutor(max_workers=4) as pool:tracks=list(pool.map(prepare,sources))
 assert len({t['id'] for t in tracks})==len(tracks)
 assert len(list(DEST.glob('*.mp3')))==len(tracks),'The upload directory contains unexpected audio'
