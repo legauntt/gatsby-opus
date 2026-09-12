@@ -5,15 +5,47 @@
 	const rows = [...document.querySelectorAll('.track')];
 	const buttons = rows.map((row) => row.querySelector('[data-play]'));
 	const status = byId('status');
+	const shuffleButtons = [...document.querySelectorAll('[data-shuffle]')];
 	const canvas = byId('waveform');
 	const context = canvas.getContext('2d');
 	let tracks = [];
 	let visible = [];
 	let queue = [];
+	let orderedQueue = [];
+	let shuffle = false;
 	let current = null;
 	let request = 0;
 	let autoAdvance = true;
 
+	function shuffled(items) {
+		const result = [...items];
+		for (let i = result.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[result[i], result[j]] = [result[j], result[i]];
+		}
+		return result;
+	}
+	function toggleShuffle() {
+		shuffle = !shuffle;
+		const index = queue.findIndex((track) => track.id === current?.id);
+		if (index >= 0) {
+			// Keep the current song and the order used by Previous.
+			const played = queue.slice(0, index + 1);
+			const upcoming = queue.slice(index + 1);
+			const ids = new Set(upcoming.map((track) => track.id));
+			queue = [
+				...played,
+				...(shuffle ? shuffled(upcoming) : orderedQueue.filter((track) => ids.has(track.id)))
+			];
+		}
+		for (const button of shuffleButtons) button.setAttribute('aria-pressed', String(shuffle));
+		message(
+			shuffle
+				? 'Shuffle on. Upcoming tracks will play in random order.'
+				: 'Shuffle off. Upcoming tracks will follow the collection order.'
+		);
+		playbackState();
+	}
 	function time(seconds) {
 		const value = Math.max(0, Math.floor(seconds || 0));
 		return `${Math.floor(value / 60)}:${String(value % 60).padStart(2, '0')}`;
@@ -100,7 +132,12 @@
 		request++;
 		audio.pause();
 		current = track;
-		if (newQueue) queue = [...newQueue];
+		if (newQueue) {
+			orderedQueue = [...newQueue];
+			queue = shuffle
+				? [track, ...shuffled(newQueue.filter((item) => item.id !== track.id))]
+				: [...newQueue];
+		}
 		byId('player').hidden = false;
 		document.body.classList.add('has-player');
 		byId('now-title').textContent = track.title;
@@ -155,7 +192,11 @@
 	byId('toggle').addEventListener('click', () => (audio.paused ? void resume() : pause()));
 	byId('previous').addEventListener('click', () => move(-1));
 	byId('next').addEventListener('click', () => move(1));
-	byId('play-all').addEventListener('click', () => select(visible[0], visible));
+	byId('play-all').addEventListener('click', () => {
+		const first = shuffle ? Math.floor(Math.random() * visible.length) : 0;
+		select(visible[first], visible);
+	});
+	for (const button of shuffleButtons) button.addEventListener('click', toggleShuffle);
 	byId('search').addEventListener('input', filter);
 	byId('sort').addEventListener('change', filter);
 	byId('clear-search').addEventListener('click', () => {
@@ -222,7 +263,8 @@
 			)
 				throw new Error('Catalog mismatch');
 			tracks = catalog.tracks;
-			for (const element of [...buttons, byId('search'), byId('sort')]) element.disabled = false;
+			for (const element of [...buttons, byId('search'), byId('sort'), byId('shuffle-collection')])
+				element.disabled = false;
 			filter();
 		})
 		.catch(() =>

@@ -154,6 +154,7 @@ h1 em {
 }
 .hero-actions {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
 	gap: 22px;
 }
@@ -177,6 +178,27 @@ h1 em {
 	color: var(--lime);
 	font-size: 11px;
 }
+.secondary {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	border: 1px solid #b7c1a9;
+	border-radius: 5px;
+	background: transparent;
+	padding: 12px 14px;
+	font-size: 11px;
+}
+.secondary svg {
+	width: 17px;
+	height: 17px;
+}
+.secondary:hover {
+	background: #e8eed7;
+}
+.secondary[aria-pressed='true'] {
+	background: var(--lime);
+	border-color: #77974c;
+}
 .hero-count {
 	font-size: 11px;
 	color: var(--muted);
@@ -185,131 +207,41 @@ h1 em {
 .hero-count > span {
 	margin: 0 5px;
 }
-.record-scene {
-	height: 325px;
-	position: relative;
-	isolation: isolate;
-	margin: 0 0 0 10px;
+.cover-art {
+	width: 100%;
+	max-width: 520px;
+	margin: 0;
+	justify-self: end;
 }
-.sleeve {
-	position: absolute;
-	width: 270px;
-	height: 270px;
-	left: 2%;
-	top: 14px;
-	border-radius: 3px;
-	background: #dceaa2;
-	box-shadow: 0 12px 28px #25302318;
-	transform: rotate(-8deg);
-	overflow: hidden;
-	z-index: 2;
-	padding: 27px;
-	color: #273b2a;
-}
-.sleeve:after {
-	content: '';
-	position: absolute;
-	width: 250px;
-	height: 250px;
-	border: 1px solid #8fa16477;
-	border-radius: 50%;
-	left: 84px;
-	top: 126px;
-	box-shadow:
-		0 0 0 11px #dceaa2,
-		0 0 0 12px #8fa16455,
-		0 0 0 23px #dceaa2,
-		0 0 0 24px #8fa16444,
-		0 0 0 35px #dceaa2,
-		0 0 0 36px #8fa16433;
-}
-.sleeve-name {
-	font-family: Georgia, serif;
-	font-size: 29px;
-	line-height: 1.13;
-	letter-spacing: -1px;
-	position: relative;
-	z-index: 2;
-}
-.sleeve-note {
-	display: block;
-	font-size: 7px;
-	letter-spacing: 1.5px;
-	line-height: 1.6;
-	margin-top: 32px;
-	position: relative;
-	z-index: 2;
-}
-.sleeve-number {
-	position: absolute;
-	left: 27px;
-	bottom: 22px;
-	font-size: 9px;
-	letter-spacing: 3px;
-	z-index: 3;
-}
-.record {
-	position: absolute;
-	right: 0;
-	top: 16px;
-	width: 265px;
-	height: 265px;
-	border-radius: 50%;
-	background: repeating-radial-gradient(
-		circle at center,
-		#18221d 0 2px,
-		#26352b 3px,
-		#18221d 4px 5px
-	);
-	box-shadow: 6px 14px 25px #1d2a2524;
+.cover-pair {
 	display: grid;
-	place-items: center;
-	transform: rotate(14deg);
+	grid-template-columns: 1fr 1fr;
+	gap: 16px;
+	align-items: start;
 }
-.record:after {
-	content: '';
-	position: absolute;
-	inset: 0;
-	border-radius: 50%;
-	background: conic-gradient(
-		from 0deg,
-		transparent,
-		#f8fff410,
-		transparent 23%,
-		#a7bcb616,
-		transparent 57%,
-		#f3fff418,
-		transparent 80%
-	);
-	pointer-events: none;
+.cover-pair a {
+	display: block;
+	min-width: 0;
+	border-radius: 4px;
 }
-.record-label {
-	width: 97px;
-	height: 97px;
-	border-radius: 50%;
-	background: #aabdae;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	gap: 5px;
-	color: #304436;
-	font-size: 6px;
-	letter-spacing: 1.5px;
+.cover-pair a:last-child {
+	margin-top: 64px;
 }
-.record-label b {
-	font:
-		30px Georgia,
-		serif;
-	letter-spacing: -2px;
+.cover-art img {
+	display: block;
+	width: 100%;
+	height: auto;
+	aspect-ratio: 1;
+	border: 6px solid #fcfcf7;
+	border-radius: 4px;
+	box-shadow: 0 12px 28px #25302320;
 }
-.record-caption {
-	position: absolute;
-	bottom: 0;
-	right: 0;
+.cover-art figcaption {
+	margin-top: 18px;
 	color: #7d8878;
 	font-size: 8px;
 	letter-spacing: 2px;
+	text-align: right;
 }
 .collection {
 	padding-bottom: 50px;
@@ -648,7 +580,8 @@ body.has-player {
 	height: 17px;
 	fill: currentColor;
 }
-.icon-button.repeat svg {
+.icon-button.repeat svg,
+.icon-button.shuffle svg {
 	fill: none;
 }
 .toggle {
@@ -718,10 +651,12 @@ body.has-player {
 	accent-color: #dceba0;
 	height: 3px;
 }
-.repeat[aria-pressed='true'] {
+.repeat[aria-pressed='true'],
+.icon-button.shuffle[aria-pressed='true'] {
 	color: var(--lime);
 }
-.repeat[aria-pressed='false'] {
+.repeat[aria-pressed='false'],
+.icon-button.shuffle[aria-pressed='false'] {
 	opacity: 0.45;
 }
 .player button:focus-visible {
@@ -745,32 +680,11 @@ body.has-player {
 		gap: 10px;
 		grid-template-columns: 1.15fr 1fr;
 	}
-	.record-scene {
-		height: 285px;
-		margin-left: 0;
+	.cover-pair {
+		gap: 10px;
 	}
-	.sleeve {
-		width: 224px;
-		height: 224px;
-		padding: 23px;
-	}
-	.sleeve-name {
-		font-size: 24px;
-	}
-	.sleeve-note {
-		margin-top: 23px;
-	}
-	.sleeve-number {
-		left: 23px;
-		bottom: 20px;
-	}
-	.record {
-		width: 222px;
-		height: 222px;
-	}
-	.record-label {
-		width: 85px;
-		height: 85px;
+	.cover-pair a:last-child {
+		margin-top: 40px;
 	}
 	.hero-actions {
 		flex-wrap: wrap;
@@ -838,8 +752,12 @@ body.has-player {
 		line-height: 1.75;
 		margin: 22px 0;
 	}
-	.record-scene {
-		display: none;
+	.cover-art {
+		max-width: 500px;
+		margin: 34px auto 0;
+	}
+	.cover-art figcaption {
+		font-size: 7px;
 	}
 	.hero-actions {
 		gap: 16px;

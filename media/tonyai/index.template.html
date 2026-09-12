@@ -31,22 +31,65 @@
 					<div class="hero-actions">
 						<button class="primary" id="play-all" disabled>
 							<span aria-hidden="true">▶</span> Play the collection</button
+						><button
+							id="shuffle-collection"
+							class="secondary shuffle"
+							data-shuffle
+							aria-label="Shuffle"
+							aria-pressed="false"
+							title="Shuffle upcoming tracks"
+							disabled
+						>
+							<svg
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.7"
+								aria-hidden="true"
+							>
+								<path
+									d="M3 6h3c4 0 8 12 12 12h3M17 14l4 4-4 4M3 18h3c2 0 4-3 6-6s4-6 6-6h3M17 2l4 4-4 4"
+								/></svg
+							><span>Shuffle</span></button
 						><span class="hero-count"
 							>{{COUNT}} tracks <span aria-hidden="true">·</span> {{TIME}}</span
 						>
 					</div>
 				</div>
-				<div class="record-scene" aria-hidden="true">
-					<div class="sleeve">
-						<span class="sleeve-name">THE OTHER<br />SIDE OF TONY.</span
-						><span class="sleeve-note">ORIGINAL SPIRIT<br />NEW POSSIBILITIES</span
-						><span class="sleeve-number">{{COUNT}} / AI</span>
+				<figure class="cover-art">
+					<div class="cover-pair">
+						<a
+							href="/tonyai/shoe-band.webp"
+							target="_blank"
+							rel="noopener"
+							aria-label="View the shoe band cover at full size (opens a new tab)"
+						>
+							<img
+								src="/tonyai/shoe-band.webp"
+								width="1024"
+								height="1024"
+								alt="Six band members with shoes for heads and hands, posing on porch steps."
+								fetchpriority="high"
+								decoding="async"
+							/>
+						</a>
+						<a
+							href="/tonyai/shoe-band-faces.webp"
+							target="_blank"
+							rel="noopener"
+							aria-label="View the shoe faces cover at full size (opens a new tab)"
+						>
+							<img
+								src="/tonyai/shoe-band-faces.webp"
+								width="1024"
+								height="1024"
+								alt="Another take on the porch portrait, with expressive faces on the band members' shoe heads and a parental advisory label."
+								decoding="async"
+							/>
+						</a>
 					</div>
-					<div class="record">
-						<div class="record-label"><span>TONY C</span><b>AI</b><span>FULL LENGTH</span></div>
-					</div>
-					<span class="record-caption">SOME FAMILIAR. SOME FAR OUT.</span>
-				</div>
+					<figcaption>SOME FAMILIAR. SOME FAR OUT.</figcaption>
+				</figure>
 			</section>
 			<section class="collection" aria-labelledby="collection-title">
 				<div class="collection-heading">
@@ -115,6 +158,26 @@
 				</div>
 			</div>
 			<div class="transport">
+				<button
+					id="shuffle"
+					class="icon-button shuffle"
+					data-shuffle
+					aria-label="Shuffle"
+					aria-pressed="false"
+					title="Shuffle upcoming tracks"
+				>
+					<svg
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="1.7"
+						aria-hidden="true"
+					>
+						<path
+							d="M3 6h3c4 0 8 12 12 12h3M17 14l4 4-4 4M3 18h3c2 0 4-3 6-6s4-6 6-6h3M17 2l4 4-4 4"
+						/>
+					</svg>
+				</button>
 				<button id="previous" class="icon-button" aria-label="Previous track">
 					<svg viewBox="0 0 24 24" aria-hidden="true">
 						<path d="M5 5v14h2V5zm14 0L8 12l11 7z" />
