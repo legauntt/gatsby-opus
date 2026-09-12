@@ -1,6 +1,6 @@
 # Tony / AI listening archive
 
-The 50 full MP3s assigned to this archive are available at `/tonyai`, including three barbershop quartets with Tony on lead, tenor, baritone, and bass. The three Fear and Hunger tracks are published separately in `legauntt/yehry3` at `/fearhunger`; `excluded-sources.json` keeps them out of this catalog. The page is unlisted, has no navigation link, and sends `noindex, nofollow, noarchive` in both its HTML and response headers. It is public to anyone with the URL; there is no access control.
+The 53 full MP3s assigned to this archive are available at `/tonyai`, including three original Diablo II lore songs with separate lyrics and genres. The three Fear and Hunger tracks are published separately in `legauntt/yehry3` at `/fearhunger`; `excluded-sources.json` keeps them out of this catalog. The page is unlisted, has no navigation link, and sends `noindex, nofollow, noarchive` in both its HTML and response headers. It is public to anyone with the URL; there is no access control.
 
 The exact original MP3 files are tracked in `mp3s/` under URL-safe filenames and published as assets of the `tonyai-v1` GitHub release. They live outside `static/` to keep the Azure deployment within its size limit. `manifest.json` records original filenames, sizes, durations, and SHA-256 hashes. Audio is copied without re-encoding.
 
