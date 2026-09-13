@@ -1,0 +1,281 @@
+{
+	"version": 1,
+	"releaseTag": "site-audio-v1",
+	"assetCount": 39,
+	"totalBytes": 201687754.0,
+	"assets": [
+		{
+			"legacyPath": "/bonus/2bad2die.m4a",
+			"name": "2bad2die.m4a",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/2bad2die.m4a",
+			"bytes": 8671163,
+			"sha256": "cb17b779f2a659ffbe235889b29d26ed0e045a9a4ac0b4dd18625c45385e2a36"
+		},
+		{
+			"legacyPath": "/bonus/all-down.m4a",
+			"name": "all-down.m4a",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/all-down.m4a",
+			"bytes": 7050649,
+			"sha256": "95dd8f6e065e2238044667dd4578481f444f9af09035a6f63217eef32ad2b7be"
+		},
+		{
+			"legacyPath": "/bonus/camaro.m4a",
+			"name": "camaro.m4a",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/camaro.m4a",
+			"bytes": 3672042,
+			"sha256": "7b7ec1015bad84aac8aa12aee7f020590f8c57d39670e61eb2c913f798af88e8"
+		},
+		{
+			"legacyPath": "/bonus/grabbapella.mp3",
+			"name": "grabbapella.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/grabbapella.mp3",
+			"bytes": 3739104,
+			"sha256": "1239e4ec915c919a721eb81795fc424f8ee4b9c200d3c5bc6ee9045a61bcdd04"
+		},
+		{
+			"legacyPath": "/bonus/hooodin.m4a",
+			"name": "hooodin.m4a",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/hooodin.m4a",
+			"bytes": 9572346,
+			"sha256": "5e653e5453e7de8b217a27e970dcb68ae231ffb90ac10b2baccb4e84ada82909"
+		},
+		{
+			"legacyPath": "/bonus/lawn-time.m4a",
+			"name": "lawn-time.m4a",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/lawn-time.m4a",
+			"bytes": 8267933,
+			"sha256": "bc36de2fcaf2322fa5c12e8119c04540f385e58315c231c6308983c4ffe04bcf"
+		},
+		{
+			"legacyPath": "/bonus/poncho.m4a",
+			"name": "poncho.m4a",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/poncho.m4a",
+			"bytes": 6818783,
+			"sha256": "c8381e96cd40eeb6a02f673d85fc15b5d5537fdef3e80f3a09d620fd70ed35b8"
+		},
+		{
+			"legacyPath": "/bonus/whale.m4a",
+			"name": "whale.m4a",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/whale.m4a",
+			"bytes": 6102539,
+			"sha256": "8f4e4fb661247084946e123f9f4d3795f1da782a168288a43746a457be69836f"
+		},
+		{
+			"legacyPath": "/butts/ambience.mp3",
+			"name": "ambience.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/ambience.mp3",
+			"bytes": 3446231,
+			"sha256": "113a2622cb7e292da21a94db9bbf3d4fda67f314678b3ee0f7a1d1176105092c"
+		},
+		{
+			"legacyPath": "/butts/dreams.mp3",
+			"name": "dreams.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/dreams.mp3",
+			"bytes": 316394,
+			"sha256": "d3f3f4fad07ae42e60289b8ef6c36d6fa2c790223574d9120869ea697436f1ec"
+		},
+		{
+			"legacyPath": "/butts/moody.mp3",
+			"name": "moody.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/moody.mp3",
+			"bytes": 1283551,
+			"sha256": "42b31dcff7cd0efabbf6a96358a119cb5391311bc8c7c1c32a7e6923bc3d0c30"
+		},
+		{
+			"legacyPath": "/butts/pullin_doublexl.mp3",
+			"name": "pullin_doublexl.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/pullin_doublexl.mp3",
+			"bytes": 476890,
+			"sha256": "3c4a54766700be4ae7e5bc398180955c726122c0583c2fbfe721031948fb8e02"
+		},
+		{
+			"legacyPath": "/butts/pullin_large.mp3",
+			"name": "pullin_large.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/pullin_large.mp3",
+			"bytes": 190170,
+			"sha256": "3ee9aff4539b0c170ef5ad3c8c8901e7cb3df4e472652788ef6541928c857a65"
+		},
+		{
+			"legacyPath": "/butts/strawng.mp3",
+			"name": "strawng.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/strawng.mp3",
+			"bytes": 164674,
+			"sha256": "ef4984fff96ac8138ea693e21f3ce585307b472bddc5f47e10b3ec4e5989c5aa"
+		},
+		{
+			"legacyPath": "/butts/woah.mp3",
+			"name": "woah.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/woah.mp3",
+			"bytes": 634461,
+			"sha256": "1a5c11e8c4d9f644d03a04eb6ce68a03fa2e3d76748e29a02ae7c50eeedd0277"
+		},
+		{
+			"legacyPath": "/butts/yehyehyehyow.mp3",
+			"name": "yehyehyehyow.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/yehyehyehyow.mp3",
+			"bytes": 759012,
+			"sha256": "7990ba6c59c554af7d9ec9fff1ca3342761b880410773535c399595ec9a4378c"
+		},
+		{
+			"legacyPath": "/dvdp/01_whoir.m4a",
+			"name": "01_whoir.m4a",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/01_whoir.m4a",
+			"bytes": 8418031,
+			"sha256": "f75b054803a5b25f710d5f4518016749e1ae41ad224ed1143ac3879ec64cb4e5"
+		},
+		{
+			"legacyPath": "/dvdp/02_glosky.m4a",
+			"name": "02_glosky.m4a",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/02_glosky.m4a",
+			"bytes": 7568399,
+			"sha256": "1e1f06ebd607c325b60f536d8274b992b88702657802e78531432741b58fda03"
+		},
+		{
+			"legacyPath": "/dvdp/03_dabez.m4a",
+			"name": "03_dabez.m4a",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/03_dabez.m4a",
+			"bytes": 6637534,
+			"sha256": "01c4106ac9151f0b9efa31bb0df878692b280240679ea1db4197386d1f1daaad"
+		},
+		{
+			"legacyPath": "/dvdp/04_balls.m4a",
+			"name": "04_balls.m4a",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/04_balls.m4a",
+			"bytes": 8455445,
+			"sha256": "288a30b8a1df24aea5b9a7463e4ecf8f20595741406e7a5ef81bb814fc610bbc"
+		},
+		{
+			"legacyPath": "/dvdp/05_nchain.m4a",
+			"name": "05_nchain.m4a",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/05_nchain.m4a",
+			"bytes": 7432322,
+			"sha256": "6ff539ed5dd132404568a7d05239e4341fdeb9dbd27ef959ce1be99ab37c96ab"
+		},
+		{
+			"legacyPath": "/dvdp/06_someday.m4a",
+			"name": "06_someday.m4a",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/06_someday.m4a",
+			"bytes": 6687440,
+			"sha256": "cc10a0f0f03da4f0ab579556edde99735fcffb87b71d0ef3873bcd6a627d9212"
+		},
+		{
+			"legacyPath": "/dvdp/07_made.m4a",
+			"name": "07_made.m4a",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/07_made.m4a",
+			"bytes": 8060906,
+			"sha256": "48fd9937dd48caa6c6b6865eefe3a5eab00c6cc99ab1b9fa0afb33b3a33d05da"
+		},
+		{
+			"legacyPath": "/dvdp/08_road.m4a",
+			"name": "08_road.m4a",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/08_road.m4a",
+			"bytes": 4966605,
+			"sha256": "f1dbd862585df121b4a917e7797295df7239d7dd65d363456b2002e359203e82"
+		},
+		{
+			"legacyPath": "/dvdp/09_novipain.m4a",
+			"name": "09_novipain.m4a",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/09_novipain.m4a",
+			"bytes": 9342787,
+			"sha256": "7ba898c77c9459795e53677bf56168cf901252c2840ffbe03d3d248ffa32b2ed"
+		},
+		{
+			"legacyPath": "/dvdp/10_gravity.m4a",
+			"name": "10_gravity.m4a",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/10_gravity.m4a",
+			"bytes": 9898480,
+			"sha256": "8f08376ce692bca6834fb286a69cc20cba5176f528f8047e4f013447e63f4364"
+		},
+		{
+			"legacyPath": "/dvdp/11_medusa.m4a",
+			"name": "11_medusa.m4a",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/11_medusa.m4a",
+			"bytes": 8444384,
+			"sha256": "23e28b22706c8b3f04b16697d52f70539ca91f39cf46fd5f5a8bca9a820cda19"
+		},
+		{
+			"legacyPath": "/dvdp/12_rounds.m4a",
+			"name": "12_rounds.m4a",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/12_rounds.m4a",
+			"bytes": 7826017,
+			"sha256": "04bd7d53ae383a3d087a77eb3ffa66bfaba9d0c29c8aaba31d3101e247e95d4f"
+		},
+		{
+			"legacyPath": "/dvdp/13_party.m4a",
+			"name": "13_party.m4a",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/13_party.m4a",
+			"bytes": 5679469,
+			"sha256": "7e313b222d47e3508f309ff7ee4438ec4b79cdfc11580d7b22f7879780efacc1"
+		},
+		{
+			"legacyPath": "/heh/7.mp3",
+			"name": "7.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/7.mp3",
+			"bytes": 3836897,
+			"sha256": "f444c3f3bf5a084d33a8fd516e95833907e18b28c52d1749c32fa5e424082dde"
+		},
+		{
+			"legacyPath": "/heh/aint.mp3",
+			"name": "aint.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/aint.mp3",
+			"bytes": 3023967,
+			"sha256": "afcb8b33b38cb7bef59e48c66665d7c25ea9fcf8821c60c49dc4a31429c31742"
+		},
+		{
+			"legacyPath": "/heh/all_twd.mp3",
+			"name": "all_twd.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/all_twd.mp3",
+			"bytes": 4346285,
+			"sha256": "19d1298deafe9a209be398db014474f386d1ac2509b7d8bbc936e94a6273b4af"
+		},
+		{
+			"legacyPath": "/heh/camaro.mp3",
+			"name": "camaro.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/camaro.mp3",
+			"bytes": 2342693,
+			"sha256": "e6bb388f9b273e518c4c8858f8fd3d206fa188fc7ab9e2beff5bb4b7a5bee71b"
+		},
+		{
+			"legacyPath": "/heh/comin.mp3",
+			"name": "comin.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/comin.mp3",
+			"bytes": 5057338,
+			"sha256": "eb25ac24eefb651e52119f61e1b8c98732c67e035c1b0b91893a2949a63c9df7"
+		},
+		{
+			"legacyPath": "/heh/everything.mp3",
+			"name": "everything.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/everything.mp3",
+			"bytes": 6923526,
+			"sha256": "5ec19b22b72d6415d010aac616b26c47443ffd3cca0bc60a2ddf428ee437d2b3"
+		},
+		{
+			"legacyPath": "/heh/grrrl.mp3",
+			"name": "grrrl.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/grrrl.mp3",
+			"bytes": 3206301,
+			"sha256": "1ebe395e2c1a6fb9fc068ebff8b02dfd42ba89b6dc6af8de25e662e975438b16"
+		},
+		{
+			"legacyPath": "/heh/hodin_it_down.mp3",
+			"name": "hodin_it_down.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/hodin_it_down.mp3",
+			"bytes": 5905795,
+			"sha256": "194f0939c91985e28a6432fa665c2ba1f8d7494eaf084662715b6121097501ee"
+		},
+		{
+			"legacyPath": "/heh/lil_acoustic.mp3",
+			"name": "lil_acoustic.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/lil_acoustic.mp3",
+			"bytes": 4064685,
+			"sha256": "ec99684d655441c039e97180701cbcf82710b75d4587b74c6d17d7e7e8e1870a"
+		},
+		{
+			"legacyPath": "/heh/manilow.mp3",
+			"name": "manilow.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/manilow.mp3",
+			"bytes": 2396506,
+			"sha256": "977f51f70e20e2c242a8710c8e54225c14691e69bc8f47b00fa32bb48b9712f9"
+		}
+	]
+}

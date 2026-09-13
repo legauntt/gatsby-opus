@@ -24,3 +24,8 @@ vite.config.ts.timestamp-*
 # Blender intermediates (regenerable via blender/monarch.py; textures are embedded in the exported GLB)
 blender/textures/
 blender/renders/
+
+# Audio is published as GitHub Release assets, never stored in Git.
+*.mp3
+*.m4a
+*.wav

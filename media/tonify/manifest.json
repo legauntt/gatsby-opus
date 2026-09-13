@@ -4,8 +4,7 @@
 	"release_tag": "tonify-v6",
 	"assets": [
 		{
-			"file": "static/tonify/mp3s/gas-station-crown.mp3",
-			"url": "/tonify/mp3s/gas-station-crown.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/gas-station-crown.mp3",
 			"kind": "song",
 			"format": "mp3",
 			"title": "Gas Station Crown",
@@ -14,7 +13,6 @@
 			"sha256": "63d537cde78327b96bb730ae992407e838dfe4564976add8c46fbb2a17430d0d"
 		},
 		{
-			"file": "media/tonify/wavs/gas-station-crown.wav",
 			"url": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/gas-station-crown.wav",
 			"kind": "song",
 			"format": "wav",
@@ -24,8 +22,7 @@
 			"sha256": "2265ca4b56298dbca957a059523ab5228156d0c823cbef87ec0c26c9a683a898"
 		},
 		{
-			"file": "static/tonify/mp3s/saint-of-the-wrong-side.mp3",
-			"url": "/tonify/mp3s/saint-of-the-wrong-side.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/saint-of-the-wrong-side.mp3",
 			"kind": "song",
 			"format": "mp3",
 			"title": "Saint of the Wrong Side",
@@ -34,7 +31,6 @@
 			"sha256": "729b909e1b3094566df33ca2611dd3952a17060a51369d2df9e58075ae37dedc"
 		},
 		{
-			"file": "media/tonify/wavs/saint-of-the-wrong-side.wav",
 			"url": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/saint-of-the-wrong-side.wav",
 			"kind": "song",
 			"format": "wav",
@@ -44,8 +40,7 @@
 			"sha256": "af66175bc9c77688b05280887d2f67e7a2cf785f5256439468513db450e3833c"
 		},
 		{
-			"file": "static/tonify/mp3s/porchlight-static.mp3",
-			"url": "/tonify/mp3s/porchlight-static.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/porchlight-static.mp3",
 			"kind": "song",
 			"format": "mp3",
 			"title": "Porchlight Static",
@@ -54,7 +49,6 @@
 			"sha256": "e8d2f66871a227c2ee6af807ba00db0bb4319591242dace1f22d284ec777065f"
 		},
 		{
-			"file": "media/tonify/wavs/porchlight-static.wav",
 			"url": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/porchlight-static.wav",
 			"kind": "song",
 			"format": "wav",
@@ -64,8 +58,7 @@
 			"sha256": "96ab170c3726233406d7cb7e36efe1a28016cfd43bf492c19dd8603778c443ea"
 		},
 		{
-			"file": "static/tonify/mp3s/v6-01a-voice-gas-station-crown.mp3",
-			"url": "/tonify/mp3s/v6-01a-voice-gas-station-crown.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-01a-voice-gas-station-crown.mp3",
 			"kind": "clip",
 			"format": "mp3",
 			"title": "V6 01A - Voice - Gas Station Crown",
@@ -74,8 +67,7 @@
 			"sha256": "9927fd46db82b11aa0d637d8a0a643c74d34b7b51e867ea1907ad7d0f271cab5"
 		},
 		{
-			"file": "static/tonify/mp3s/v6-01b-voice-gas-station-crown.mp3",
-			"url": "/tonify/mp3s/v6-01b-voice-gas-station-crown.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-01b-voice-gas-station-crown.mp3",
 			"kind": "clip",
 			"format": "mp3",
 			"title": "V6 01B - Voice - Gas Station Crown",
@@ -84,8 +76,7 @@
 			"sha256": "f43b2068e7b712d9fe0b3d3fd015cfa4a469a80f7374dfa1f9d83ee4e946a83c"
 		},
 		{
-			"file": "static/tonify/mp3s/v6-02a-backing-gas-station-crown.mp3",
-			"url": "/tonify/mp3s/v6-02a-backing-gas-station-crown.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-02a-backing-gas-station-crown.mp3",
 			"kind": "clip",
 			"format": "mp3",
 			"title": "V6 02A - Backing - Gas Station Crown",
@@ -94,8 +85,7 @@
 			"sha256": "e66b742d3e07f0490c38fd2bd6284a2b1be94a0607f69fd654a755419026b9ee"
 		},
 		{
-			"file": "static/tonify/mp3s/v6-02b-backing-gas-station-crown.mp3",
-			"url": "/tonify/mp3s/v6-02b-backing-gas-station-crown.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-02b-backing-gas-station-crown.mp3",
 			"kind": "clip",
 			"format": "mp3",
 			"title": "V6 02B - Backing - Gas Station Crown",
@@ -104,8 +94,7 @@
 			"sha256": "38a6c1c4693d601f1bb0c35fb119ee7e8d7267df0b8de745d358450e95a8f1ae"
 		},
 		{
-			"file": "static/tonify/mp3s/v6-03a-combined-gas-station-crown.mp3",
-			"url": "/tonify/mp3s/v6-03a-combined-gas-station-crown.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-03a-combined-gas-station-crown.mp3",
 			"kind": "clip",
 			"format": "mp3",
 			"title": "V6 03A - Combined - Gas Station Crown",
@@ -114,8 +103,7 @@
 			"sha256": "120532060a91590550558d77683fd06fe32ca5ca0f4c087dd7cc339b12161947"
 		},
 		{
-			"file": "static/tonify/mp3s/v6-03b-combined-gas-station-crown.mp3",
-			"url": "/tonify/mp3s/v6-03b-combined-gas-station-crown.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-03b-combined-gas-station-crown.mp3",
 			"kind": "clip",
 			"format": "mp3",
 			"title": "V6 03B - Combined - Gas Station Crown",
@@ -124,8 +112,7 @@
 			"sha256": "9913a61c9dddac2ff6d9ddb3060022311a7f4230354ed48bec81e4fa1a88d86d"
 		},
 		{
-			"file": "static/tonify/mp3s/v6-04a-voice-saint-of-the-wrong-side.mp3",
-			"url": "/tonify/mp3s/v6-04a-voice-saint-of-the-wrong-side.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-04a-voice-saint-of-the-wrong-side.mp3",
 			"kind": "clip",
 			"format": "mp3",
 			"title": "V6 04A - Voice - Saint of the Wrong Side",
@@ -134,8 +121,7 @@
 			"sha256": "b1629cd03af1c469e1656bf8978da5170ed9b2474a68c63cd5fa8e67f367cfad"
 		},
 		{
-			"file": "static/tonify/mp3s/v6-04b-voice-saint-of-the-wrong-side.mp3",
-			"url": "/tonify/mp3s/v6-04b-voice-saint-of-the-wrong-side.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-04b-voice-saint-of-the-wrong-side.mp3",
 			"kind": "clip",
 			"format": "mp3",
 			"title": "V6 04B - Voice - Saint of the Wrong Side",
@@ -144,8 +130,7 @@
 			"sha256": "43527b313f8f442037d0f597d322c7ce900868a183881a695e94dfd8b9b5394b"
 		},
 		{
-			"file": "static/tonify/mp3s/v6-05a-backing-saint-of-the-wrong-side.mp3",
-			"url": "/tonify/mp3s/v6-05a-backing-saint-of-the-wrong-side.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-05a-backing-saint-of-the-wrong-side.mp3",
 			"kind": "clip",
 			"format": "mp3",
 			"title": "V6 05A - Backing - Saint of the Wrong Side",
@@ -154,8 +139,7 @@
 			"sha256": "5178f722440e0b785137c3ba0132d7a46daa627eb8be8e5026ee714567164950"
 		},
 		{
-			"file": "static/tonify/mp3s/v6-05b-backing-saint-of-the-wrong-side.mp3",
-			"url": "/tonify/mp3s/v6-05b-backing-saint-of-the-wrong-side.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-05b-backing-saint-of-the-wrong-side.mp3",
 			"kind": "clip",
 			"format": "mp3",
 			"title": "V6 05B - Backing - Saint of the Wrong Side",
@@ -164,8 +148,7 @@
 			"sha256": "758170af0dd7931e3bfb4af6299b058afa6ce8c34ac0d32f11057924dadad5e8"
 		},
 		{
-			"file": "static/tonify/mp3s/v6-06a-combined-saint-of-the-wrong-side.mp3",
-			"url": "/tonify/mp3s/v6-06a-combined-saint-of-the-wrong-side.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-06a-combined-saint-of-the-wrong-side.mp3",
 			"kind": "clip",
 			"format": "mp3",
 			"title": "V6 06A - Combined - Saint of the Wrong Side",
@@ -174,8 +157,7 @@
 			"sha256": "e22bde4a131fcb02980e0f18bec7fbb86613f25c746ad013e30a1c570e0977ec"
 		},
 		{
-			"file": "static/tonify/mp3s/v6-06b-combined-saint-of-the-wrong-side.mp3",
-			"url": "/tonify/mp3s/v6-06b-combined-saint-of-the-wrong-side.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-06b-combined-saint-of-the-wrong-side.mp3",
 			"kind": "clip",
 			"format": "mp3",
 			"title": "V6 06B - Combined - Saint of the Wrong Side",
@@ -184,8 +166,7 @@
 			"sha256": "f84060121369cb81cf7325592f53ba235633c02f8c4ffeeba0cb538e93f9a8fe"
 		},
 		{
-			"file": "static/tonify/mp3s/v6-07a-voice-porchlight-static.mp3",
-			"url": "/tonify/mp3s/v6-07a-voice-porchlight-static.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-07a-voice-porchlight-static.mp3",
 			"kind": "clip",
 			"format": "mp3",
 			"title": "V6 07A - Voice - Porchlight Static",
@@ -194,8 +175,7 @@
 			"sha256": "b5afc87dd67900104f799f73bdd7903d007711194db5b62264cde68a83fbba09"
 		},
 		{
-			"file": "static/tonify/mp3s/v6-07b-voice-porchlight-static.mp3",
-			"url": "/tonify/mp3s/v6-07b-voice-porchlight-static.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-07b-voice-porchlight-static.mp3",
 			"kind": "clip",
 			"format": "mp3",
 			"title": "V6 07B - Voice - Porchlight Static",
@@ -204,8 +184,7 @@
 			"sha256": "cdbc2b5dbc835a6ddbcb6dec5a02a9b401d925c3ff95ce97b02e44633137252d"
 		},
 		{
-			"file": "static/tonify/mp3s/v6-08a-backing-porchlight-static.mp3",
-			"url": "/tonify/mp3s/v6-08a-backing-porchlight-static.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-08a-backing-porchlight-static.mp3",
 			"kind": "clip",
 			"format": "mp3",
 			"title": "V6 08A - Backing - Porchlight Static",
@@ -214,8 +193,7 @@
 			"sha256": "3ceae909f70956f9970c9d36b99bf7dad95a41bb7250296a28c647df61995fe0"
 		},
 		{
-			"file": "static/tonify/mp3s/v6-08b-backing-porchlight-static.mp3",
-			"url": "/tonify/mp3s/v6-08b-backing-porchlight-static.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-08b-backing-porchlight-static.mp3",
 			"kind": "clip",
 			"format": "mp3",
 			"title": "V6 08B - Backing - Porchlight Static",
@@ -224,8 +202,7 @@
 			"sha256": "1886e070393374a2ca2fe4f128bd6e166ae76e7bbd1db38deb6f99da71744d74"
 		},
 		{
-			"file": "static/tonify/mp3s/v6-09a-combined-porchlight-static.mp3",
-			"url": "/tonify/mp3s/v6-09a-combined-porchlight-static.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-09a-combined-porchlight-static.mp3",
 			"kind": "clip",
 			"format": "mp3",
 			"title": "V6 09A - Combined - Porchlight Static",
@@ -234,8 +211,7 @@
 			"sha256": "b4120f9aa4bf8e712291f4d9f2eb412010e3014cf28dde431f8d4fc313e57ef9"
 		},
 		{
-			"file": "static/tonify/mp3s/v6-09b-combined-porchlight-static.mp3",
-			"url": "/tonify/mp3s/v6-09b-combined-porchlight-static.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-09b-combined-porchlight-static.mp3",
 			"kind": "clip",
 			"format": "mp3",
 			"title": "V6 09B - Combined - Porchlight Static",
@@ -244,8 +220,7 @@
 			"sha256": "eba1b75f931ba59f4091e090dc30b523d71004c9db590f65527ec4d45809259b"
 		},
 		{
-			"file": "static/tonify/mp3s/v6-19-showcase-gas-station-crown.mp3",
-			"url": "/tonify/mp3s/v6-19-showcase-gas-station-crown.mp3",
+			"url": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-19-showcase-gas-station-crown.mp3",
 			"kind": "clip",
 			"format": "mp3",
 			"title": "V6 19 - Showcase - Gas Station Crown",

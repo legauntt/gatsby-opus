@@ -5,14 +5,12 @@
 	"release_tag": "vopera-v1",
 	"assets": [
 		{
-			"file": "media/vopera/mp3s/someday-magic-vaccine-opera.mp3",
 			"format": "mp3",
 			"bytes": 10694758,
 			"sha256": "d41a3e921b295f09e36aefe3c519b42356d99a7e7003a7f9584a8590a9f56d9b",
 			"url": "https://github.com/legauntt/gatsby-opus/releases/download/vopera-v1/someday-magic-vaccine-opera.mp3"
 		},
 		{
-			"file": "media/vopera/wavs/someday-magic-vaccine-opera.wav",
 			"format": "wav",
 			"bytes": 70727624,
 			"sha256": "95183be64356adc22f9c83f55c0b1577d60ccf145204109a1584595f29ca2a87",

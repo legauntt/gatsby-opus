@@ -13,6 +13,7 @@
 	import toast from 'svelte-5-french-toast';
 	import { jukebawx } from '$lib/player.svelte';
 	import { copyToClippy } from '$lib/utilz';
+	import { releaseAudioUrl, TREASURE_TROVE } from '$lib/cetlist';
 
 	const buildTime = dayjs(__BUILD_TIME__).format('YYYY-MM-DD HH:mm:ss');
 
@@ -38,7 +39,7 @@
 		};
 	}
 
-	let selectedTrack = $state('/butts/ambience.mp3');
+	let selectedTrack = $state(TREASURE_TROVE.CLICES[0]);
 	let clices: IClice[] = $state([]);
 	let logs: string[] = $state([]);
 
@@ -73,6 +74,7 @@
 				const preset = response.data.preset || {};
 				title = preset.title;
 				clices = preset.clices.map((entry: IClice) => {
+					entry.audioFile = releaseAudioUrl(entry.audioFile);
 					entry.currentTime = 0;
 					entry.paused = true;
 					return entry;

@@ -1,0 +1,327 @@
+{
+	"routes": [
+		{
+			"route": "/bonus/2bad2die.m4a",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/2bad2die.m4a",
+			"statusCode": 302
+		},
+		{
+			"route": "/bonus/all-down.m4a",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/all-down.m4a",
+			"statusCode": 302
+		},
+		{
+			"route": "/bonus/camaro.m4a",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/camaro.m4a",
+			"statusCode": 302
+		},
+		{
+			"route": "/bonus/grabbapella.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/grabbapella.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/bonus/hooodin.m4a",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/hooodin.m4a",
+			"statusCode": 302
+		},
+		{
+			"route": "/bonus/lawn-time.m4a",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/lawn-time.m4a",
+			"statusCode": 302
+		},
+		{
+			"route": "/bonus/poncho.m4a",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/poncho.m4a",
+			"statusCode": 302
+		},
+		{
+			"route": "/bonus/whale.m4a",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/whale.m4a",
+			"statusCode": 302
+		},
+		{
+			"route": "/butts/ambience.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/ambience.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/butts/dreams.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/dreams.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/butts/moody.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/moody.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/butts/pullin_doublexl.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/pullin_doublexl.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/butts/pullin_large.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/pullin_large.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/butts/strawng.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/strawng.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/butts/woah.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/woah.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/butts/yehyehyehyow.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/yehyehyehyow.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/dvdp/01_whoir.m4a",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/01_whoir.m4a",
+			"statusCode": 302
+		},
+		{
+			"route": "/dvdp/02_glosky.m4a",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/02_glosky.m4a",
+			"statusCode": 302
+		},
+		{
+			"route": "/dvdp/03_dabez.m4a",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/03_dabez.m4a",
+			"statusCode": 302
+		},
+		{
+			"route": "/dvdp/04_balls.m4a",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/04_balls.m4a",
+			"statusCode": 302
+		},
+		{
+			"route": "/dvdp/05_nchain.m4a",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/05_nchain.m4a",
+			"statusCode": 302
+		},
+		{
+			"route": "/dvdp/06_someday.m4a",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/06_someday.m4a",
+			"statusCode": 302
+		},
+		{
+			"route": "/dvdp/07_made.m4a",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/07_made.m4a",
+			"statusCode": 302
+		},
+		{
+			"route": "/dvdp/08_road.m4a",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/08_road.m4a",
+			"statusCode": 302
+		},
+		{
+			"route": "/dvdp/09_novipain.m4a",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/09_novipain.m4a",
+			"statusCode": 302
+		},
+		{
+			"route": "/dvdp/10_gravity.m4a",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/10_gravity.m4a",
+			"statusCode": 302
+		},
+		{
+			"route": "/dvdp/11_medusa.m4a",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/11_medusa.m4a",
+			"statusCode": 302
+		},
+		{
+			"route": "/dvdp/12_rounds.m4a",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/12_rounds.m4a",
+			"statusCode": 302
+		},
+		{
+			"route": "/dvdp/13_party.m4a",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/13_party.m4a",
+			"statusCode": 302
+		},
+		{
+			"route": "/heh/7.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/7.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/heh/aint.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/aint.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/heh/all_twd.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/all_twd.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/heh/camaro.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/camaro.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/heh/comin.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/comin.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/heh/everything.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/everything.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/heh/grrrl.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/grrrl.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/heh/hodin_it_down.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/hodin_it_down.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/heh/lil_acoustic.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/lil_acoustic.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/heh/manilow.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1/manilow.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/tonify/mp3s/gas-station-crown.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/gas-station-crown.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/tonify/mp3s/porchlight-static.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/porchlight-static.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/tonify/mp3s/saint-of-the-wrong-side.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/saint-of-the-wrong-side.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/tonify/mp3s/v6-01a-voice-gas-station-crown.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-01a-voice-gas-station-crown.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/tonify/mp3s/v6-01b-voice-gas-station-crown.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-01b-voice-gas-station-crown.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/tonify/mp3s/v6-02a-backing-gas-station-crown.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-02a-backing-gas-station-crown.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/tonify/mp3s/v6-02b-backing-gas-station-crown.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-02b-backing-gas-station-crown.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/tonify/mp3s/v6-03a-combined-gas-station-crown.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-03a-combined-gas-station-crown.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/tonify/mp3s/v6-03b-combined-gas-station-crown.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-03b-combined-gas-station-crown.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/tonify/mp3s/v6-04a-voice-saint-of-the-wrong-side.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-04a-voice-saint-of-the-wrong-side.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/tonify/mp3s/v6-04b-voice-saint-of-the-wrong-side.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-04b-voice-saint-of-the-wrong-side.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/tonify/mp3s/v6-05a-backing-saint-of-the-wrong-side.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-05a-backing-saint-of-the-wrong-side.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/tonify/mp3s/v6-05b-backing-saint-of-the-wrong-side.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-05b-backing-saint-of-the-wrong-side.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/tonify/mp3s/v6-06a-combined-saint-of-the-wrong-side.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-06a-combined-saint-of-the-wrong-side.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/tonify/mp3s/v6-06b-combined-saint-of-the-wrong-side.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-06b-combined-saint-of-the-wrong-side.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/tonify/mp3s/v6-07a-voice-porchlight-static.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-07a-voice-porchlight-static.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/tonify/mp3s/v6-07b-voice-porchlight-static.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-07b-voice-porchlight-static.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/tonify/mp3s/v6-08a-backing-porchlight-static.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-08a-backing-porchlight-static.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/tonify/mp3s/v6-08b-backing-porchlight-static.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-08b-backing-porchlight-static.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/tonify/mp3s/v6-09a-combined-porchlight-static.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-09a-combined-porchlight-static.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/tonify/mp3s/v6-09b-combined-porchlight-static.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-09b-combined-porchlight-static.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/tonify/mp3s/v6-19-showcase-gas-station-crown.mp3",
+			"redirect": "https://github.com/legauntt/gatsby-opus/releases/download/tonify-v6/v6-19-showcase-gas-station-crown.mp3",
+			"statusCode": 302
+		},
+		{
+			"route": "/tonyai",
+			"rewrite": "/tonyai/index.html",
+			"headers": {
+				"X-Robots-Tag": "noindex, nofollow, noarchive"
+			}
+		},
+		{
+			"route": "/tonyai/*",
+			"headers": {
+				"X-Robots-Tag": "noindex, nofollow, noarchive"
+			}
+		}
+	],
+	"responseOverrides": {
+		"404": {
+			"rewrite": "/index.html"
+		}
+	}
+}

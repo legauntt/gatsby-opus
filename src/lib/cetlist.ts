@@ -2,6 +2,14 @@ interface SimpleMap {
 	[key: string]: string[];
 }
 
+const SITE_AUDIO = 'https://github.com/legauntt/gatsby-opus/releases/download/site-audio-v1';
+
+export const releaseAudioUrl = (value: string) => {
+	if (!value.startsWith('/')) return value;
+	const match = value.match(/^\/(?:dvdp|bonus|heh|butts)\/([^/]+)$/);
+	return match ? `${SITE_AUDIO}/${match[1]}` : value;
+};
+
 export const TREASURE_TROVE: SimpleMap = {
 	DEMON: [
 		'01_whoir.m4a',
@@ -17,7 +25,7 @@ export const TREASURE_TROVE: SimpleMap = {
 		'11_medusa.m4a',
 		'12_rounds.m4a',
 		'13_party.m4a'
-	].map((entry) => `/dvdp/${entry}`),
+	].map((entry) => `${SITE_AUDIO}/${entry}`),
 
 	BONUS: [
 		'2bad2die.m4a',
@@ -28,7 +36,7 @@ export const TREASURE_TROVE: SimpleMap = {
 		'lawn-time.m4a',
 		'poncho.m4a',
 		'whale.m4a'
-	].map((entry) => `/bonus/${entry}`),
+	].map((entry) => `${SITE_AUDIO}/${entry}`),
 
 	SEVEN: [
 		'7.mp3',
@@ -41,7 +49,7 @@ export const TREASURE_TROVE: SimpleMap = {
 		'hodin_it_down.mp3',
 		'lil_acoustic.mp3',
 		'manilow.mp3'
-	].map((entry) => `/heh/${entry}`),
+	].map((entry) => `${SITE_AUDIO}/${entry}`),
 
 	CLICES: [
 		'ambience.mp3',
@@ -52,5 +60,5 @@ export const TREASURE_TROVE: SimpleMap = {
 		'strawng.mp3',
 		'woah.mp3',
 		'yehyehyehyow.mp3'
-	].map((entry) => `/butts/${entry}`)
+	].map((entry) => `${SITE_AUDIO}/${entry}`)
 };
